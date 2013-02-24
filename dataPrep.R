@@ -19,27 +19,73 @@ library(xts)
 # Retrieve forecast data file from NYISO web site, reformat data into xts object
 
 # Initialize parameters
+timeZone <- 'America/New_York'
+seriesStartDate <- ISOdate(2010,12,1,0,0,0,tz=timeZone)
+seriesEndDate   <- ISOdate(2010,12,2,0,0,0,tz=timeZone)
+nForecasts <-  6   # Number of days of forecasts in each NYISIO file
+nHrs       <- 24   # Hrs/day, = number of forecasts issued per forecasted day
+# Actually, nHrs = 25, to allow for the one day per year when the clock transitions from EDT to EST
+nZones     <- 11   # Number of NYISO load control zones
+nSecsPerDay <- 3600*24
+
+nFiles <- as.integer(seriesEndDate - seriesStartDate)+1
+nValidDates <- nFiles+nForecasts-1
+nValidDates
+allValidDates <- seriesStartDate + nSecsPerDay*0:(nValidDates-1)
+str(allValidDates)
+allValidDates
+
+# Fetch the names of the eleven NYISO zones (date is basically arbitrary)
 URLdir <- "http://mis.nyiso.com/public/csv/isolf/"  # Location of NYISO files
-startYr  <- 2013  # Year/month/day of first files
-startMo  <-    2
-startDay <-   17
-seriesStartDate <- ISOdate(startYr,startMo,startDay,0,0,0, tz='America/New_York')
+URL <- paste(URLdir,'20130224isolf.csv', sep="")  # URL of a NYISO load forecast csv file
+fileHeader <- read.table(URL, header = TRUE, sep = ",",nrows=1)
+zoneNames <- names(fileHeader[1+1:nZones])
 
-ndates <-  6  # Number of days of forecasts in each NYISIO file
-nlags <- ndates+1  # Cumulative umber of forecasts issued per target hour, where lag=0 corresponds to the verifying observation.
-nzones <- 11  # Number of NYISO load control zones
-nhrs   <- 24  # Hrs/day, = number of forecasts issued per forecasted day
+nLags <- nForecasts+1  # Cumulative number of forecasts issued per target hour; 
 
-issueDate <- seriesStartDate
+# Prepare a big array into which to load the forecasts and obs;
+# 0-day-lag corresponds to the verifying observation
+dimnames = list(
+     paste('Valid',strftime(allValidDates,format='%Y-%m-%d'))
+     ,paste(0:nForecasts,'day lag',sep="-")
+     ,zoneNames
+     ,paste('hr',0:(nHrs-1),sep=""))
 
-# For each date for which a
-for(issueDate in seriesStartDate+1:2){
-     Yr <- strftime(issueDate,format='%Y')
-     Mo <- strftime(issueDate,format='%m')
-     Day <- strftime(issueDate,format='%d')
-     URL <- paste(URLdir,Yr,Mo,Day,"isolf.csv", sep="")
+dimnames
+
+big.array <- array(dim=c(nValidDates,nForecasts+1,nZones,nHrs),dimnames=dimnames)
+dim(big.array)
+
+
+# For each date for which forecast file is issued: fetch data, load into temporary array
+for(i in 0:(nFiles-1)){
+     # Fetch the day's file from NYISO, read values into temporary table
+     fileDate  <- seriesStartDate + i*nSecsPerDay
+     Yr <- strftime(fileDate,format='%Y')
+     Mo <- strftime(fileDate,format='%m')
+     Day <- strftime(fileDate,format='%d')
+     URL <- paste(URLdir,Yr,Mo,Day,"isolf.csv", sep="")  # URL of the NYISO load forecast csv file
      fcsts <- read.table(URL, header = TRUE, sep = ",")
+     # Forecasts are issued on the day before the file label date
+     validDates <- fileDate + nSecsPerDay*0:(nForecasts-1)
+     dimnames = list(
+           paste('Valid',strftime(validDates,format='%Y-%m-%d'))
+          ,paste(0:nForecasts,'day lag',sep="-")
+          ,names(fcsts[2:12])                             # Names of the 11 NYISO zones
+          ,paste('hr',0:(nHrs-1),sep=""))
+     temp.array <- array(dim=c(nForecasts,nLags,nZones,nHrs),dimnames=dimnames)
+     for(date in 1:nForecasts){
+          for (zone in 1:nZones){
+               temp.array[date,date+1,zone,1:24]<- as.matrix(fcsts[(1:24)+(date-1)*24,zone+1])
+               
+          }
+     }
      
+     
+     issueDate <- fileDate - nSecsPerDay 
+     print(paste("Forecasts issued on",strftime(issueDate,format='%Y-%m-%d'),"valid for N.Y.C. zone on",strftime(validDates[nForecasts],format='%Y-%m-%d')))
+#     print(paste("Forecasts issued on",strftime(issueDate,format='%Y-%m-%d'),"valid for N.Y.C. zone on",strftime(issueDate+nForecasts*3600*24,format='%Y-%m-%d')))
+     print(temp.array[nForecasts,nForecasts+1,'N.Y.C.', ])
 }
 
 
@@ -56,13 +102,10 @@ URL
 
 # Create an empty array with the required dimensions
 # Create a POSIXt object with the (six) forecast dates
-dates <- issueDate + 3600*24*1:ndates
 dates
 # Create labels for the four dimensions of the array
-dimnames = list(paste('Valid',strftime(dates,format='%Y-%m-%d')),paste(0:(nlags-1),'day lag',sep="-"),names(fcsts[2:12]),paste('hr',0:(nhrs-1),sep=""))
 
 # Create the empty array, populated with NAs
-temp.array <- array(dim=c(ndates,nlags,nzones,nhrs),dimnames=dimnames)
 # dim(temp.array)
 # [1]  6 24 11  7
 
@@ -76,18 +119,12 @@ temp.array <- array(dim=c(ndates,nlags,nzones,nhrs),dimnames=dimnames)
 # Create temp.array[day,lag,zone,hour]
 
 
-for(date in 1:6){
-     for (zone in 1:11){
-          temp.array[date,date+1,zone,1:24]<- as.matrix(fcsts[(1:24)+(date-1)*24,zone+1])
-     }
-}
 
 
 issueDate <- issueDate + 3600*24
 
 
 
-temp.array[6,7 ,'N.Y.C.' , ]
 
 dimnames(temp.array[ ,,,1])[[1]]
 
