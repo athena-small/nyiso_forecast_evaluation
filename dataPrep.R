@@ -21,7 +21,7 @@ library(xts)
 # Initialize parameters
 timeZone <- 'America/New_York'
 seriesStartDate <- ISOdate(2010,12,1,0,0,0,tz=timeZone)
-seriesEndDate   <- ISOdate(2010,12,2,0,0,0,tz=timeZone)
+seriesEndDate   <- ISOdate(2010,12,5,0,0,0,tz=timeZone)
 nForecasts <-  6   # Number of days of forecasts in each NYISIO file
 nHrs       <- 24   # Hrs/day, = number of forecasts issued per forecasted day
 # Actually, nHrs = 25, to allow for the one day per year when the clock transitions from EDT to EST
@@ -47,20 +47,18 @@ nLags <- nForecasts+1  # Cumulative number of forecasts issued per target hour;
 # 0-day-lag corresponds to the verifying observation
 dimnames = list(
      paste('Valid',strftime(allValidDates,format='%Y-%m-%d'))
-     ,paste(0:nForecasts,'day lag',sep="-")
+     ,paste('lag',0:nForecasts,sep="")
      ,zoneNames
      ,paste('hr',0:(nHrs-1),sep=""))
-
-dimnames
 
 big.array <- array(dim=c(nValidDates,nForecasts+1,nZones,nHrs),dimnames=dimnames)
 dim(big.array)
 
 
 # For each date for which forecast file is issued: fetch data, load into temporary array
-for(i in 0:(nFiles-1)){
+for(fileNumber in 1:nFiles){
      # Fetch the day's file from NYISO, read values into temporary table
-     fileDate  <- seriesStartDate + i*nSecsPerDay
+     fileDate  <- seriesStartDate + (fileNumber-1)*nSecsPerDay
      Yr <- strftime(fileDate,format='%Y')
      Mo <- strftime(fileDate,format='%m')
      Day <- strftime(fileDate,format='%d')
@@ -71,17 +69,17 @@ for(i in 0:(nFiles-1)){
      dimnames = list(
            paste('Valid',strftime(validDates,format='%Y-%m-%d'))
           ,paste(0:nForecasts,'day lag',sep="-")
-          ,names(fcsts[2:12])                             # Names of the 11 NYISO zones
+          ,zoneNames    # Names of the 11 NYISO zones
           ,paste('hr',0:(nHrs-1),sep=""))
-     temp.array <- array(dim=c(nForecasts,nLags,nZones,nHrs),dimnames=dimnames)
-     for(date in 1:nForecasts){
+     temp.array <- array(dim=c(nForecasts,nForecasts+1,nZones,nHrs),dimnames=dimnames)
+     for(lag in 1:nForecasts){
+          date <- lag
+          rowNumber <- fileNumber + (lag-1)
           for (zone in 1:nZones){
-               temp.array[date,date+1,zone,1:24]<- as.matrix(fcsts[(1:24)+(date-1)*24,zone+1])
-               
+               temp.array[date,lag+1,zone,1:24]<- as.matrix(fcsts[(1:24)+(lag-1)*24,zone+1])
+               big.array[rowNumber,lag+1,zone,1:24] <- as.matrix(fcsts[(1:24)+(lag-1)*24,zone+1])
           }
      }
-     
-     
      issueDate <- fileDate - nSecsPerDay 
      print(paste("Forecasts issued on",strftime(issueDate,format='%Y-%m-%d'),"valid for N.Y.C. zone on",strftime(validDates[nForecasts],format='%Y-%m-%d')))
 #     print(paste("Forecasts issued on",strftime(issueDate,format='%Y-%m-%d'),"valid for N.Y.C. zone on",strftime(issueDate+nForecasts*3600*24,format='%Y-%m-%d')))
@@ -89,11 +87,9 @@ for(i in 0:(nFiles-1)){
 }
 
 
-
-issueDate
-
-URL
-
+dim(big.array)
+big.array[is.na(big.array)==FALSE]
+big.array[,,1,1]
 
 #  str(fcsts$Time.Stamp)
 
