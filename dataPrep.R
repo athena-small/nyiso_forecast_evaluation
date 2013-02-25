@@ -3,25 +3,18 @@
 #  Array dimensions are: 
 #    dateTime t: date+time for which forecast is valid. Class: POSIX. Range: period of record
 
-#    hour h = 0, ..., 23: hour for which forecast is valid. Class: factor.
-#    zone z = 1, ..., 11  : NYISO load control region. Class: factor. 
+#    hour hr = 0, ..., 23: hour for which forecast is valid. Class: factor.
+#    zone zone = 1, ..., 11  : NYISO load control region. Class: factor. 
 #    forecast lag time k=0,..., 6; number of days between forecast issued-on and valid-for dates. Class: factor.
 #  Entries are forecasts (for k > 0) and obs (k=0) of load in MWh/hr
-library(plyr)
-library(xts)
+#library(plyr)
+#library(xts)
 
-
-#  Read forecast data in from external data file, and organize them in a data frame called "forecasts"
-# fileName <- c("Data/forecasts_dec2007.csv")
-# forecasts <- read.table(fileName, header = TRUE, sep = ",")
-# dateTime <- paste(forecasts$year,forecasts$month,forecasts$day)
-
-# Retrieve forecast data file from NYISO web site, reformat data into xts object
 
 # Initialize parameters
 timeZone <- 'America/New_York'
-seriesStartDate <- ISOdate(2011,3,7,0,0,0,tz=timeZone)
-seriesEndDate   <- ISOdate(2011,3,14,0,0,0,tz=timeZone)
+seriesStartDate <- ISOdate(2013,2,16,0,0,0,tz=timeZone)
+seriesEndDate   <- ISOdate(2013,2,24,0,0,0,tz=timeZone)
 nZones     <- 11   # Number of NYISO load control zones
 nHrs       <- 24   # Hrs/day, = number of forecasts issued per forecasted day
 # Actually, nHrs = 25, to allow for the one day per year when the clock transitions from EDT to EST
@@ -32,9 +25,7 @@ nSecsPerDay <- 3600*24
 
 nFiles <- as.integer(seriesEndDate - seriesStartDate)+1
 nValidDates <- nFiles+nForecasts-1
-nValidDates
 allValidDates <- seriesStartDate + nSecsPerDay*0:(nValidDates-1)
-str(allValidDates)
 allValidDates
 
 # Fetch the names of the eleven NYISO zones (date is arbitrary)
@@ -42,6 +33,8 @@ URLdir <- "http://mis.nyiso.com/public/csv/isolf/"  # Location of NYISO files
 URL <- paste(URLdir,'20130224isolf.csv', sep="")    # URL of a NYISO load forecast csv file
 fileHeader <- read.table(URL, header = TRUE, sep = ",",nrows=1)
 zoneNames <- names(fileHeader[1+1:nZones])
+
+URLdirLoad <- "http://mis.nyiso.com/public/csv/palIntegrated/"
 
 
 # Prepare a big array into which to load the forecasts and obs;
@@ -73,18 +66,31 @@ for(fileNumber in 1:nFiles){
                big.array[dateNumber,nLags-lag,zone,1:24] <- as.matrix(fcsts[(1:24)+(lag-1)*24,zone+1])
           }
      }
+
+     # Now fetch the obs:
+     URL <- paste(URLdirLoad,Yr,Mo,Day,"palIntegrated.csv", sep="")  # URL of the NYISO load obs csv file
+     loads <- read.table(URL, header = TRUE, sep = ",")
+     for(hour in 0:23){
+          big.array[fileNumber,'obs',1:nZones,hour] <- as.matrix(loads[hour*nZones+1:nZones,5])
+     }
+     # fileNumber
+     # big.array[fileNumber,'obs',]
 }
 
 length(big.array[is.na(big.array['Valid 2011-03-13',,'N.Y.C.',1])==TRUE])
 
-big.array[is.na(big.array['Valid 2011-03-13',-7,'N.Y.C.',])==TRUE]
+test <- c('Valid 2011-03-12','Valid 2011-03-13')
+big.array[is.na(big.array[test,-7,'N.Y.C.',1])==TRUE]
 
-big.array['Valid 2011-03-13',-7,'N.Y.C.',]
+big.array[,,'N.Y.C.','hr17']
+attributes(big.array)$dim
 
-
+save(big.array,file='load_forecasts.dat')
 
 ######### DEPRECATED CODE ############
-
+test.array[ ,'obs'][is.na(test.array[,'obs']==TRUE)]
+is.na(test.array[,'obs']==TRUE
+     
 # Convert partially filled array into an xts object
 # Alas, function as.xts() doesn't work on arrays, so need first to convert to a data frame 
 temp.df <- as.data.frame(temp.array)
