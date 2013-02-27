@@ -7,7 +7,7 @@
 #    forecast lag time k=0,..., 6; number of days between forecast issued-on and valid-for dates. Class: factor.
 #  Entries are forecasts (for k > 0) and obs (k=0) of load in MWh/hr
 #library(plyr)
-#library(xts)
+library(xts)
 
 
 # Initialize parameters
@@ -34,10 +34,25 @@ zoneNames <- names(fileHeader[1+1:nZones])
 
 URLdirLoad <- "http://mis.nyiso.com/public/csv/palIntegrated/"
 localLoadDataDir <-"./Data/"
+
+
+
+# MAKE LONG DATA FRAME ----------------------------------------------------
+
+dfColnames <- c('ID','issuedDateTime','validDateTime','zone','loadMW')
+matrix()
+
+# data.frame(row.names='ID',check.rows=TRUE,check.names=TRUE)
+# long.df <- data.frame()
+
+
+# MAKE BIG ARRAY ----------------------------------------------------------
+
 # Prepare a big array into which to load the forecasts and obs;
 # lag0 corresponds to the verifying observation
 dimnames = list(
-     paste('Valid',strftime(allValidDates,format='%Y-%m-%d'))
+     allValidDates
+     #     strftime(allValidDates,format='%Y-%m-%d')
      ,paste('lag',nForecasts:0,sep="")
      ,zoneNames
      ,paste('hr',0:(nHrs-1),sep=""))
@@ -70,6 +85,29 @@ for(fileNumber in 1:nFiles){
      }
 }
 
+
+loads <- read.table(URL,header=TRUE,sep=",",as.is=c(1))
+obsDateTime <- strptime(loads[,1],format="%m/%d/%Y %H:%M:%S",tz=timeZone)
+# Check for Daylight Savings Time transitions; handle with care     
+if(length(unique(obsDateTime$isdst))!=1){  # "If today is a transition..." 
+     if(nrow(loads)==nZones*(nHrs+1)){     # "If today has 25 hours..."
+          obsDateTime$isdst[2*nZones+1:nZones] <- 0  # Reset 3rd hr to EST
+     }
+     #     if(nrow(loads)==nZones*(nHrs-1)){
+     #         # Spring forward          
+     #     }
+}
+
+
+colNames <- c('obsDateTime','zone','zone#','load')
+temp.df <- cbind(obsDateTime,loads[,3:5])
+colnames(temp.df) <- colNames
+str(temp.df[,1])
+str(obsDateTime)
+temp.df[1:35,1]
+head(temp.df,35)
+str(temp.df)
+
 N <- nrow(big.array) # = length(allValidDates)
 rowsWithNAs <- c(1:5,(N-4):N)
 rowsWithNAs 
@@ -77,6 +115,10 @@ big.array[-rowsWithNAs,,'N.Y.C.','hr16']
 dim(big.array)
 dim(big.array[-rowsWithNAs,,,])
 big.array <- big.array[-rowsWithNAs,,,]
+dimnames(big.array)
+
+big.array[,1,1,1]
+attributes(big.array)
 
 big.array['Valid 2012-11-04',,'N.Y.C.','hr16']
 big.array[,,'N.Y.C.','hr16']
@@ -87,6 +129,7 @@ small.array[rowTest, ]
 
 small.array[, 'lag5']['Valid 2012-11-04']
 dimnames(small.array)
+
 save(big.array,file='load_forecasts.dat')
 
 # length(big.array[is.na(big.array['Valid 2011-03-13',,'N.Y.C.',1])==TRUE])
