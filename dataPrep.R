@@ -34,8 +34,8 @@ loadLocalDir <-"./Data/"
 
 # MAKE LONG DATA FRAME ----------------------------------------------------
 
-seriesStartDate <- ISOdate(2012,11,1,0,0,0,tz=timeZone)
-seriesEndDate   <- ISOdate(2012,11,3,0,0,0,tz=timeZone)
+seriesStartDate <- ISOdate(2012,10,1,0,0,0,tz=timeZone)
+seriesEndDate   <- ISOdate(2013,02,24,0,0,0,tz=timeZone)
 nFiles <- as.integer(seriesEndDate - seriesStartDate)+1
 # nValidDates <- nFiles+nForecasts-1
 # allValidDates <- seriesStartDate + nSecsPerDay*0:(nValidDates-1)
@@ -50,7 +50,7 @@ for(fileNumber in 0:(nFiles-1)){
      Mo  <- strftime(fileDate,format='%m')
      Day <- strftime(fileDate,format='%d')
      URL <- paste(loadLocalDir,Yr,Mo,"01palIntegrated_csv/",Yr,Mo,Day,"palIntegrated.csv", sep="")
-     loads <- read.table(URL,header=TRUE,sep=",",as.is=c(1,3))
+     loads <- read.table(URL,header=TRUE,sep=",",as.is=c(1))
      obsDateTime <- strptime(loads[,1],format="%m/%d/%Y %H:%M:%S",tz=timeZone)
 
      # Check for Daylight Savings Time transitions; handle with care     
@@ -66,7 +66,7 @@ for(fileNumber in 0:(nFiles-1)){
      }
      
      # Create an xts object containing all load obs retrieved thus far
-     temp.xts <- as.xts(cbind(loads[,3],loads[,5]), order.by=as.POSIXct(obsDateTime))
+     temp.xts <- as.xts(cbind(loads[,4],loads[,5]), order.by=as.POSIXct(obsDateTime))
      if(fileNumber==0){
           allObs.xts <- temp.xts
      } else {
@@ -85,9 +85,9 @@ colnames(allObs.xts) <- c('zone','obs')
 head(allObs.xts,2)     
 tail(allObs.xts,2)
 nrow(allObs.xts['2012-11-04 01'])
-nrow(allObs.xts)
+nrow(allObs.xts)/(11*24)
 allObs.xts['2012-11-04 01']
-11*(25+24+24)
+str(allObs.xts)
 # data.frame(row.names='ID',check.rows=TRUE,check.names=TRUE)
 # long.df <- data.frame()
 
