@@ -21,46 +21,48 @@ nHrs       <- 24   # Hrs/day, = number of forecasts issued per (normal) forecast
 nSecsPerDay <- 3600*24 # Useful in conversions between date classes
 
 # Locations of NYISO forecast and load files
-fcstURLdir   <- "http://mis.nyiso.com/public/csv/isolf/"      
-loadURLdir   <- "http://mis.nyiso.com/public/csv/palIntegrated/"
+# fcstURLdir   <- "http://mis.nyiso.com/public/csv/isolf/"      
+# loadURLdir   <- "http://mis.nyiso.com/public/csv/palIntegrated/"
 loadLocalDir <-"./Data/"
+
 # Fetch the names of the eleven NYISO zones from a forecast file (any will do, date is arbitrary)
-fcstURL <- paste(fcstURLdir,'20130224isolf.csv', sep="")    # URL of a sample load forecast csv file
-fcstFileHeader <- read.table(fcstURL, header = TRUE, sep = ",",nrows=1,as.is=c(1))
-zoneNames <- names(fcstFileHeader[1+1:nZones])
-rm(fcstFileHeader)
+# fcstURL <- paste(fcstURLdir,'20130224isolf.csv', sep="")    # URL of a sample load forecast csv file
+# fcstFileHeader <- read.table(fcstURL, header = TRUE, sep = ",",nrows=1,as.is=c(1))
+# zoneNames <- names(fcstFileHeader[1+1:nZones])
+# rm(fcstFileHeader)
 
 
 # MAKE LONG DATA FRAME ----------------------------------------------------
 
-seriesStartDate <- ISOdate(2012,11,4,0,0,0,tz=timeZone)
-seriesEndDate   <- ISOdate(2012,11,6,0,0,0,tz=timeZone)
+seriesStartDate <- ISOdate(2012,11,1,0,0,0,tz=timeZone)
+seriesEndDate   <- ISOdate(2012,11,3,0,0,0,tz=timeZone)
 nFiles <- as.integer(seriesEndDate - seriesStartDate)+1
 # nValidDates <- nFiles+nForecasts-1
 # allValidDates <- seriesStartDate + nSecsPerDay*0:(nValidDates-1)
 # allValidDates
 
-
-as.integer(seriesEndDate-seriesStartDate)
 # For each date for which forecast file is issued: fetch data, load into big array
 # fileNumber<-0
+fileDate  <- seriesStartDate
 for(fileNumber in 0:(nFiles-1)){
-     # Fetch the day's forecast file from NYISO, read values into temporary table
-     fileDate  <- seriesStartDate + fileNumber*nSecsPerDay
+     # Fetch the obs from local location of downloaded & unzipped NYISO load obs csv file
      Yr  <- strftime(fileDate,format='%Y')
      Mo  <- strftime(fileDate,format='%m')
      Day <- strftime(fileDate,format='%d')
-
-     # Fetch the obs from local location of downloaded & unzipped NYISO load obs csv file
      URL <- paste(loadLocalDir,Yr,Mo,"01palIntegrated_csv/",Yr,Mo,Day,"palIntegrated.csv", sep="")
      loads <- read.table(URL,header=TRUE,sep=",",as.is=c(1,3))
      obsDateTime <- strptime(loads[,1],format="%m/%d/%Y %H:%M:%S",tz=timeZone)
 
      # Check for Daylight Savings Time transitions; handle with care     
-     if(length(unique(obsDateTime$isdst))!=1){  # "If today is a transition..." 
+     if(length(unique(obsDateTime$isdst))==1){ # "If today is not a DST transition day..." 
+          fileDate <- fileDate + nSecsPerDay    # Advance ISOdate by 24 hours          
+     } else { # "If today IS a DST transition day..." 
           if(nrow(loads)==nZones*(nHrs+1)){     # "If today has 25 hours..."
                obsDateTime$isdst[2*nZones+1:nZones] <- 0  # Reset 3rd hr to EST
-          }
+               fileDate <- fileDate + nSecsPerDay+3600    # Advance ISOdate by 25 hours
+          } else {
+               fileDate <- fileDate + nSecsPerDay-3600    # Advance ISOdate by 23 hours               
+          }          
      }
      
      # Create an xts object containing all load obs retrieved thus far
@@ -69,12 +71,12 @@ for(fileNumber in 0:(nFiles-1)){
           allObs.xts <- temp.xts
      } else {
           allObs.xts <- rbind(allObs.xts,temp.xts)
-     }
-     
+     }     
 }
 
+
 # dfColnames <- c('ID','issuedDateTime','validDateTime','zone','loadMW')
-colnames(allObs.xts) <- c('zone','loadMW')
+colnames(allObs.xts) <- c('zone','obs')
 
 #     allObs.xts<- rbind.xts(allObsInit.xts,temp.xts,tzone=timeZone)
      
@@ -85,7 +87,7 @@ tail(allObs.xts,2)
 nrow(allObs.xts['2012-11-04 01'])
 nrow(allObs.xts)
 allObs.xts['2012-11-04 01']
-     
+11*(25+24+24)
 # data.frame(row.names='ID',check.rows=TRUE,check.names=TRUE)
 # long.df <- data.frame()
 
