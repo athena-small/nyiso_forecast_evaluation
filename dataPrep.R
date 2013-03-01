@@ -32,10 +32,12 @@ loadLocalDir <-"./Data/"
 # rm(fcstFileHeader)
 
 
-# MAKE LONG DATA FRAME ----------------------------------------------------
 
 seriesStartDate <- ISOdate(2012,10,1,0,0,0,tz=timeZone)
 seriesEndDate   <- ISOdate(2013,02,24,0,0,0,tz=timeZone)
+
+# Make long xts object containting all load realizations ----------------------------
+
 nFiles <- as.integer(seriesEndDate - seriesStartDate)+1
 # nValidDates <- nFiles+nForecasts-1
 # allValidDates <- seriesStartDate + nSecsPerDay*0:(nValidDates-1)
@@ -64,33 +66,39 @@ for(fileNumber in 0:(nFiles-1)){
                fileDate <- fileDate + nSecsPerDay-3600    # Advance ISOdate by 23 hours               
           }          
      }
-     
+
      # Create an xts object containing all load obs retrieved thus far
-     temp.xts <- as.xts(cbind(loads[,4],loads[,5]), order.by=as.POSIXct(obsDateTime))
-     if(fileNumber==0){
-          allObs.xts <- temp.xts
-     } else {
-          allObs.xts <- rbind(allObs.xts,temp.xts)
+     attributes(obsDateTime)$tzone <-  timeZone     
+     todaysObs.xts <- as.xts(cbind(loads[,4],loads[,5]), order.by=obsDateTime)
+     if(fileNumber==0){ # "If this is the first day in the series..."
+          obs.xts <- todaysObs.xts  
+     } else {           # "If not... "
+          obs.xts <- rbind(obs.xts,todaysObs.xts)
      }     
 }
 
+colnames(obs.xts) <- c('zone','obs')
 
-# dfColnames <- c('ID','issuedDateTime','validDateTime','zone','loadMW')
-colnames(allObs.xts) <- c('zone','obs')
+save(obs.xts,file='obs.rda')
 
-#     allObs.xts<- rbind.xts(allObsInit.xts,temp.xts,tzone=timeZone)
-     
-#     str(temp.xts)     
 
-head(allObs.xts,2)     
-tail(allObs.xts,2)
-nrow(allObs.xts['2012-11-04 01'])
-nrow(allObs.xts)/(11*24)
-allObs.xts['2012-11-04 01']
-str(allObs.xts)
-# data.frame(row.names='ID',check.rows=TRUE,check.names=TRUE)
-# long.df <- data.frame()
+# Select out subset: loads for N.Y.C., 5:00 p.m. on weekdays
+x <- obs.xts[.indexhour(obs.xts)==17 & obs.xts$zone==61761 & .indexwday(obs.xts) %in% 1:5]$obs
+hist(x,xlim=c(6000,8000), 50)
+plot(x,main="Electricity consumption by N.Y.C. 5-6p.m. weekdays",ylab="MW")
 
+plot(obs.xts[obs.xts$zone==61761]['T17:00/T17:01']$obs)
+
+
+# dfColnames <- c('ID','issuedDateTime','validDateTime','zone','loadMW')     
+
+# Tests to make sure output is OK
+head(obs.xts,2)
+tail(obs.xts,2)
+nrow(obs.xts['2012-11-04 01'])
+nrow(obs.xts)/(11*24)
+obs.xts['2012-11-04 01']
+str(obs.xts)
 
 # MAKE BIG ARRAY ----------------------------------------------------------
 
@@ -134,6 +142,13 @@ for(fileNumber in 1:nFiles){
 
 # ######### DEPRECATED CODE ############
 
+# attributes(index(obs.xts))$names[3]
+# head(coredata(obs.xts))
+# obs.xts[index(obs.xts)$hour==17]
+# 
+# obs.xts[obs.xts$zone==61761]['2013-02']
+# attributes(obs.xts)
+# 
 #      N <- nrow(big.array) # = length(allValidDates)
 #      rowsWithNAs <- c(1:5,(N-4):N)
 #      rowsWithNAs 
