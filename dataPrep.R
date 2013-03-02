@@ -2,232 +2,152 @@
 #  Fetches NYISO load forecasts and obs from local directory, creates data array
 #  Array dimensions are: 
 #    dateTime validDate: date for which forecast is valid. Class: POSIX. Range: period of record
-#    hour hr = 0, ..., 23: hour for which forecast is valid. Class: factor.
 #    zone zone = 1, ..., 11  : NYISO load control region. Class: factor. 
 #    forecast lag time k=0,..., 6; number of days between forecast issued-on and valid-for dates. Class: factor.
 #  Entries are forecasts (for k > 0) and obs (k=0) of load in MWh/hr
 #library(plyr)
 library(xts)
+load('zoneData.rda')
 
 # Initialize parameters ---------------------------------------------------
 
 timeZone <- 'America/New_York'
 Sys.setenv(TZ=timeZone)
-nZones     <- 11   # Number of NYISO load control zones
-nHrs       <- 24   # Hrs/day, = number of forecasts issued per (normal) forecasted day
-# N.B. nHrs = 23 or 25 when clock transitions between Daylight Savings Time and EST
-# nForecasts <-  6 # Number of days of forecasts in each NYISIO file
-# nLags <- nForecasts+1  # Cumulative number of forecasts issued per target hour, counting the verifying observation as lag=0
-nSecsPerDay <- 3600*24 # Useful in conversions between date classes
+nZones <- nrow(zoneData)  # Number of NYISO load control zones
+SecsPerHr <- 3600 
+
+nLags <-  6  # Number of days of forecasts in each NYISIO file
 
 # Locations of NYISO forecast and load files
-# fcstURLdir   <- "http://mis.nyiso.com/public/csv/isolf/"      
-# loadURLdir   <- "http://mis.nyiso.com/public/csv/palIntegrated/"
-loadLocalDir <-"./Data/"
+fcstURLdir <- "http://mis.nyiso.com/public/csv/isolf/"
+obsURLdir  <- "./Data/"
+# obsURLdir <- "http://mis.nyiso.com/public/csv/palIntegrated/"
 
-# Fetch the names of the eleven NYISO zones from a forecast file (any will do, date is arbitrary)
-# fcstURL <- paste(fcstURLdir,'20130224isolf.csv', sep="")    # URL of a sample load forecast csv file
-# fcstFileHeader <- read.table(fcstURL, header = TRUE, sep = ",",nrows=1,as.is=c(1))
-# zoneNames <- names(fcstFileHeader[1+1:nZones])
-# rm(fcstFileHeader)
-
-
-
-seriesStartDate <- ISOdate(2012,10,1,0,0,0,tz=timeZone)
-seriesEndDate   <- ISOdate(2013,02,24,0,0,0,tz=timeZone)
-
-# Make long xts object containting all load realizations ----------------------------
-
+seriesStartDate <- ISOdate(2012,11,4,0,0,0,tz=timeZone)
+seriesEndDate   <- ISOdate(2012,11,4,0,0,0,tz=timeZone)
 nFiles <- as.integer(seriesEndDate - seriesStartDate)+1
-# nValidDates <- nFiles+nForecasts-1
-# allValidDates <- seriesStartDate + nSecsPerDay*0:(nValidDates-1)
-# allValidDates
 
-# For each date for which forecast file is issued: fetch data, load into big array
-# fileNumber<-0
+# Make object 'loads.xts' containting all forecasts and obs ----------------------------
+#   Data are to be organized in an xts object in which each row corresponds
+#   to one hour's obs and six lagged forecasts of that obs, for one zone.
+
+fcst.array <- array(dim=c(nLags,nLags*24+1,1+nZones))
+dimnames(fcst.array)[[3]] <- c("Valid for",zoneData$names)
+
 fileDate  <- seriesStartDate
-for(fileNumber in 0:(nFiles-1)){
-     # Fetch the obs from local location of downloaded & unzipped NYISO load obs csv file
+for(fileCount in 0:(nFiles-1)){
      Yr  <- strftime(fileDate,format='%Y')
      Mo  <- strftime(fileDate,format='%m')
      Day <- strftime(fileDate,format='%d')
-     URL <- paste(loadLocalDir,Yr,Mo,"01palIntegrated_csv/",Yr,Mo,Day,"palIntegrated.csv", sep="")
-     loads <- read.table(URL,header=TRUE,sep=",",as.is=c(1))
-     obsDateTime <- strptime(loads[,1],format="%m/%d/%Y %H:%M:%S",tz=timeZone)
+     
+     # Fetch today's obs from a local directory
+     obsURL <- paste(obsURLdir,Yr,Mo,"01palIntegrated_csv/",Yr,Mo,Day,"palIntegrated.csv", sep="")
+     obs <- read.table(obsURL,header=TRUE,sep=",",as.is=c(1))
+     
+     obsDateTime <- strptime(obs[,1],format="%m/%d/%Y %H:%M:%S",tz=timeZone)
 
      # Check for Daylight Savings Time transitions; handle with care     
-     if(length(unique(obsDateTime$isdst))==1){ # "If today is not a DST transition day..." 
-          fileDate <- fileDate + nSecsPerDay    # Advance ISOdate by 24 hours          
-     } else { # "If today IS a DST transition day..." 
-          if(nrow(loads)==nZones*(nHrs+1)){     # "If today has 25 hours..."
-               obsDateTime$isdst[2*nZones+1:nZones] <- 0  # Reset 3rd hr to EST
-               fileDate <- fileDate + nSecsPerDay+3600    # Advance ISOdate by 25 hours
-          } else {
-               fileDate <- fileDate + nSecsPerDay-3600    # Advance ISOdate by 23 hours               
-          }          
-     }
-
-     # Create an xts object containing all load obs retrieved thus far
-     attributes(obsDateTime)$tzone <-  timeZone     
-     todaysObs.xts <- as.xts(cbind(loads[,4],loads[,5]), order.by=obsDateTime)
-     if(fileNumber==0){ # "If this is the first day in the series..."
-          obs.xts <- todaysObs.xts  
-     } else {           # "If not... "
-          obs.xts <- rbind(obs.xts,todaysObs.xts)
-     }     
-}
-
-colnames(obs.xts) <- c('zone','obs')
-
-save(obs.xts,file='obs.rda')
-
-
-# Select out subset: loads for N.Y.C., 5:00 p.m. on weekdays
-x <- obs.xts[.indexhour(obs.xts)==17 & obs.xts$zone==61761 & .indexwday(obs.xts) %in% 1:5]$obs
-hist(x,xlim=c(6000,8000), 50)
-plot(x,main="Electricity consumption by N.Y.C. 5-6p.m. weekdays",ylab="MW")
-
-plot(obs.xts[obs.xts$zone==61761]['T17:00/T17:01']$obs)
-
-
-# dfColnames <- c('ID','issuedDateTime','validDateTime','zone','loadMW')     
-
-# Tests to make sure output is OK
-head(obs.xts,2)
-tail(obs.xts,2)
-nrow(obs.xts['2012-11-04 01'])
-nrow(obs.xts)/(11*24)
-obs.xts['2012-11-04 01']
-str(obs.xts)
-
-# MAKE BIG ARRAY ----------------------------------------------------------
-
-# Prepare a big array into which to load the forecasts and obs;
-# lag0 corresponds to the verifying observation
-dimnames = list(
-     allValidDates
-     #     strftime(allValidDates,format='%Y-%m-%d')
-     ,paste('lag',nForecasts:0,sep="")
-     ,zoneNames
-     ,paste('hr',0:(nHrs-1),sep=""))
-big.array <- array(dim=c(nValidDates,nLags,nZones,nHrs),dimnames=dimnames)
-dimnames(big.array)[[2]][7] <- "obs"
-
-# For each date for which forecast file is issued: fetch data, load into big array
-for(fileNumber in 1:nFiles){
-     # Fetch the day's file from NYISO, read values into temporary table
-     fileDate  <- seriesStartDate + (fileNumber-1)*nSecsPerDay
-     Yr  <- strftime(fileDate,format='%Y')
-     Mo  <- strftime(fileDate,format='%m')
-     Day <- strftime(fileDate,format='%d')
-     URL <- paste(URLdir,Yr,Mo,Day,"isolf.csv", sep="")  # URL of the NYISO load forecast csv file
-     fcsts <- read.table(URL, header = TRUE, sep = ",")
-     for (zone in 1:nZones){
-          for(lag in 1:nForecasts){
-               # Grab one day's data, put in big.array in the right place
-               dateNumber <- (fileNumber-1)+lag
-               big.array[dateNumber,nLags-lag,zone,1:24] <- as.matrix(fcsts[(1:24)+(lag-1)*24,zone+1])
+     nHrs <- 24
+     if(length(unique(obsDateTime$isdst))!=1){# If today is a DST transition day...
+          if(nrow(obs)==nZones*(nHrs+1)){       # If today has 25 hours,
+               nHrs <- 25                       
+               obsDateTime$isdst[2*nZones+1:nZones] <- 0  # Set 3rd hr to EST  
+          } else {                              # If not, 
+               nHrs <- 23                       # then today must have 23 hours.
           }
      }
+
+     # Create an xts object containing today's observations
+     attributes(obsDateTime)$tzone <-  timeZone     
+     todaysObs.xts <- as.xts(cbind(obs[,4],obs[,5]), order.by=obsDateTime)
      
-     # Now fetch the obs:
-#     URL <- paste(URLdirLoad,Yr,Mo,Day,"palIntegrated.csv", sep="")  # URL of the NYISO load obs csv file
-     URL <- paste(localLoadDataDir,Yr,Mo,"01palIntegrated_csv/",Yr,Mo,Day,"palIntegrated.csv", sep="")  # local location of downloaded & unzipped NYISO load obs csv file
-     loads <- read.table(URL, header = TRUE, sep = ",")
-     for(hour in 0:23){
-          big.array[fileNumber,'obs',1:nZones,hour] <- as.matrix(loads[hour*nZones+1:nZones,5])
+     # Fetch the forecasts issued yesterday, located in a file named for today's date
+     fcstURL <- paste(fcstURLdir,Yr,Mo,Day,"isolf.csv", sep="")
+     fcstsIssuedYesterday.df <- read.table(fcstURL, header = TRUE, sep = ",")
+
+     # Load the forecasts issued yesterday into the lag=1 slot of the forecast array
+     x <- fcstsIssuedYesterday.df[,1:(nZones+1)]
+     fcst.array[1,1:nrow(fcstsIssuedYesterday.df),1:(nZones+1)]  <- as.matrix(x)
+     
+     # Extract all the forecasts valid for today
+     forecastsValidForToday.3D <- fcst.array[,1:nHrs,2:(nZones+1)]
+     
+     # Add lagged forecasts as columns in a merged xts object
+     merged.xts <- todaysObs.xts
+     for(lag in 1){
+          x <- as.integer(as.vector(forecastsValidForToday.3Darray[lag,,]))
+          hr <- 1     
+          y <- x[hr + 25*(0:(nZones-1))]
+          for(hr in 2:nHrs){
+               y <- c(y,x[hr + 25*(0:(nZones-1))])
+          }
+          y.xts <- as.xts(y, order.by=obsDateTime)
+
+          # Merge today's obs and forecasts into a combined xts object
+          merged.xts <- merge(todaysObs.xts,y.xts,tzone=timeZone)
      }
+     
+     
+     # Add today's forecasts and obs to those retrieved earlier for previous dates
+     if(fileCount==0){ #  If this is the first day in the series...
+          # Create an xts object to contain all obs and fcsts     
+          loads.xts <- merged.xts  
+     } else {           # If not... 
+          # Append today's data to those from earlier dates
+          loads.xts <- rbind(loads.xts,merged.xts)
+     }
+     
+     # Prepare for next day's data:
+     # Shift forecasts over by 1 lag
+     # Clear the rest of the cells in fcst.array
+     # [...]
+     
+     # Advance the clock by one day
+     fileDate <- fileDate + nHrs*SecsPerHr
 }
+
+# nCols <- nLags+2  
+nCols <- 3          # Temporary: When finished coding, will reset
+# Order columns by decreasing lags, then obs
+loads.xts <- loads.xts[,c(1,nCols:2)]  
+colnames(loads.xts) <- c('zone',paste('lag',(nCols-2):1,sep=""),'obs')
+
+save(loads.xts,file='NYISO_load_fcsts_and_obs.rda')
+
 
 
 # ######### DEPRECATED CODE ############
 
-# attributes(index(obs.xts))$names[3]
-# head(coredata(obs.xts))
-# obs.xts[index(obs.xts)$hour==17]
-# 
-# obs.xts[obs.xts$zone==61761]['2013-02']
-# attributes(obs.xts)
-# 
-#      N <- nrow(big.array) # = length(allValidDates)
-#      rowsWithNAs <- c(1:5,(N-4):N)
-#      rowsWithNAs 
-#      big.array[-rowsWithNAs,,'N.Y.C.','hr16']
-#      dim(big.array)
-#      dim(big.array[-rowsWithNAs,,,])
-#      big.array <- big.array[-rowsWithNAs,,,]
-#      dimnames(big.array)
-#      
-#      big.array[,1,1,1]
-#      attributes(big.array)
-#      
-#      big.array['Valid 2012-11-04',,'N.Y.C.','hr16']
-#      big.array[,,'N.Y.C.','hr16']
-#      small.array <- big.array[,,'N.Y.C.','hr16']
-#      rowTest
-#      rowTest <- c('Valid 2012-11-04','Valid 2012-11-05')
-#      small.array[rowTest, ]
-#      
-#      small.array[, 'lag5']['Valid 2012-11-04']
-#      dimnames(small.array)
-#      
-#      save(big.array,file='load_forecasts.dat')
-#      
-#      # length(big.array[is.na(big.array['Valid 2011-03-13',,'N.Y.C.',1])==TRUE])
-#      # test <- c('Valid 2011-03-12','Valid 2011-03-13')
-#      # big.array[is.na(big.array[test,-7,'N.Y.C.',1])==TRUE]
-#      # attributes(big.array)$dim
-#      
-#      # 
-     
-# test.array[ ,'obs'][is.na(test.array[,'obs']==TRUE)]
-# is.na(test.array[,'obs']==TRUE
-#      
-# # Convert partially filled array into an xts object
-# # Alas, function as.xts() doesn't work on arrays, so need first to convert to a data frame 
-# temp.df <- as.data.frame(temp.array)
-# temp.xts <- as.xts(temp.df, order.by=dates)
-# 
-# 
-# head(temp.xts['2013-02-23'])
-# tail(temp.xts)$'hr6'
-# 
-# str(temp.xts)
-# 
-# dim(temp.df[1])
-# temp.df <- as.data.frame(temp.array)
-# xtsible(temp.df)
-# 
-# 
-# 
-# validTime <- as.POSIXct(fcsts$Time.Stamp, format="%m/%d/%Y %H:%M", tz='America/New_York')
-# fcsts.xts <- as.xts(fcsts[2:12],order.by=validTime)
-# # str(fcsts.xts)
-# 
-# # head(fcsts.xts['/2013-02-20','North'])
-# 
-# 
-# tail(dateTime)
-# tail(dateTime) - issueDatetime
-# 
-# temp.df[1:3]
-# nrow(temp.df)
-# nrows(temp.array)
-# dimnames(temp.array)
-# df <- data.frame(11,7)
-# temp.xts <- as.xts(temp.df, order.by=dateTime[1:2])
-# temp.xts
-# nrow(temp.array)
-# 
+
+# Tests to make sure output is OK
+head(loads.xts,2)
+tail(loads.xts,2)
+nrow(loads.xts['2012-11-04 01'])
+nrow(loads.xts)/(11*24)
+loads.xts['2012-11-04 01']
+loads.xts['2012-11-04 5']
+str(loads.xts)
+
+attributes(index(loads.xts))$names[3]
+head(coredata(loads.xts))
+loads.xts[index(loads.xts)$hour==17]
+
+errors <- loads.xts[loads.xts$zone==61761][,2] - loads.xts[loads.xts$zone==61761][,3] 
+plot(errors)
+
+hist(errors,13)
+
+
+max(e)
+summary(errors)
+
+attributes(loads.xts)
+
+
+
 # # m = c(10,20,30) # means for each of the 3 point locations
 # Reps <- length(space)*length(dateTime)/length(m)
 # mydata = rnorm(length(space)*length(dateTime),mean=rep(m, Reps))
 # IDs = paste("ID",1:length(mydata))
 # #  mydata = data.frame(values = signif(mydata,3), ID=IDs)
 # # length(mydata$values)+length(mydata$ID)
-# length(fcsts[,2])
-# 
-# mydata <- as.vector(fcsts[2:12])
-# length(mydata)
-# 
-# nrow(fcsts[2:12])
