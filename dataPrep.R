@@ -75,7 +75,7 @@ for(fileCount in 0:(nFiles-1)){
      # Add lagged forecasts as columns in a merged xts object
      merged.xts <- todaysObs.xts
      for(lag in 1){
-          x <- as.integer(as.vector(forecastsValidForToday.3Darray[lag,,]))
+          x <- as.integer(as.vector(forecastsValidForToday.3D[lag,,]))
           hr <- 1     
           y <- x[hr + 25*(0:(nZones-1))]
           for(hr in 2:nHrs){
@@ -106,18 +106,29 @@ for(fileCount in 0:(nFiles-1)){
      fileDate <- fileDate + nHrs*SecsPerHr
 }
 
-# nCols <- nLags+2  
-nCols <- 3          # Temporary: When finished coding, will reset
+nLags <- 1          # Temporary: When finished coding, will reset to 6
+
 # Order columns by decreasing lags, then obs
-loads.xts <- loads.xts[,c(1,nCols:2)]  
-colnames(loads.xts) <- c('zone',paste('lag',(nCols-2):1,sep=""),'obs')
+loads.xts <- loads.xts[,c(1,(nLags+2):2)]  
+colnames(loads.xts) <- c('zone',paste('lag',nLags:1,sep=""),'obs')
 
-save(loads.xts,file='NYISO_load_fcsts_and_obs.rda')
+head(loads.xts)
+# Create an xts object of load forecasting errors
+errors.xts <- zones.xts <- loads.xts[,1]
+for(lag in nLags:1){
+   x.xts <- loads.xts[,2+nLags-lag] - loads.xts[,2+nLags]
+   errors.xts <- merge(errors.xts,x.xts)
+}
 
+list=c('loads.xts','errors.xts')
+save(list=list,file='NYISO_load_forecast_evaluation.rda')
 
 
 # ######### DEPRECATED CODE ############
 
+head(loads.xts[,nLags+2-lag])
+head(loads.xts[,nLags+2])
+rm(errors.xts)
 
 # Tests to make sure output is OK
 head(loads.xts,2)
@@ -132,17 +143,18 @@ attributes(index(loads.xts))$names[3]
 head(coredata(loads.xts))
 loads.xts[index(loads.xts)$hour==17]
 
-errors <- loads.xts[loads.xts$zone==61761][,2] - loads.xts[loads.xts$zone==61761][,3] 
-plot(errors)
+errors.xts <- loads.xts[loads.xts$zone==61761][,2] - loads.xts[loads.xts$zone==61761][,3] 
+errors.xts <- loads.xts[,2] - loads.xts[,3] 
+zones.xts <- loads.xts[,1]
+loads.xts[,1]
 
-hist(errors,13)
+errors.xts <- merge(zones.xts,errors.xts)
+head(errors.xts)
+str(errors.xts)
+errors.xts[errors.xts$zone==61761]
 
-
-max(e)
-summary(errors)
 
 attributes(loads.xts)
-
 
 
 # # m = c(10,20,30) # means for each of the 3 point locations
