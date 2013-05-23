@@ -1,0 +1,11 @@
+ A - WEST     42°17'32.70" N  79°13'08.46" W
+ B - GENESE   42°16'46.20" N  78°02'50.20" W
+ C - CENTRL
+ D - NORTH
+ E - MHK VL
+ F - CAPITL
+ G - HUD VL
+ H - MILLWD
+ I - DUNWOD
+ J - N.Y.C.
+ K - LONGIL

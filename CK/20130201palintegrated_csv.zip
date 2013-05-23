@@ -1,0 +1,494 @@
+<!DOCTYPE html> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head> 
+	 <script type="text/javascript" src="http://d.turn.com/r/dd/id/L21rdC8xMDAvY2lkLzE2ODUwMTU2L3QvMA/cat/100003"> </script>
+  <script type="text/javascript" language="JavaScript">
+if (self != top){
+	top.location.href = "/index.adp?MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&vsgpId=&vsgId=101995&UserAgent=&ProxyHost=&TunnelIfId=363224";
+}
+  </script>  
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Welcome to AT&T Wi-Fi Service @ Penn State University</title>
+  <link rel="shortcut icon" href="/graphics/att/favicon.ico"/>
+  <link href="/css/aws/laptop/sitestyle.css" rel="stylesheet" type="text/css"/>
+  <script type="text/javascript" src="/dhtml/aws/dhtml.js"></script>
+  <script type="text/javascript" src="/dhtml/jquery/jquery-1.3.2.js"></script>
+<!--[if lte IE 7]>
+<style>
+#memberid {
+	width:230px;
+    border-color:#7b9ebd;
+    border-width:1px;
+}
+</style>
+<![endif]-->
+
+  <script type="text/javascript">
+jQuery(window).bind("focus", function(event){
+	if($(".infomask")){
+		$(".infomask").css({'display':'none'});	
+	}
+}); 
+
+$(document).ready(function() {
+	tall=$(document).height();
+	
+	$("#close_alert,.infowindow,.infomask").click(function(){
+			$(".infomask").css({'display':'none'});
+			$(".infowindow").css({'display':'none'});
+	});
+});
+
+function moreClick(){
+	$(".infomask").animate({opacity:.5},0);
+	$(".infomask").height(tall);
+	$(".infomask").css({'display':'block'});
+	$(".infowindow").show();
+	return false;
+}
+
+function closeAlert(){
+	return false;
+}
+
+  </script> 
+
+  <script src="/dhtml/mtagconfig.js" type="text/Javascript"></script> 
+
+
+ </head>
+ <body>
+
+  <div class="infowindow">
+   <div class="infobox">
+    <p>You must purchase full internet access to continue</p>
+    <a onclick="closeAlert();return false;" href="#" id="close_alert">Close</a>
+   </div>
+  </div>
+  <div class="infomask"></div> 
+
+  <div id="index_page" class="page">	
+
+   <div class="toplinks">
+    <div id="leftside"> 
+    </div id="leftside">
+    <div id="rightside"> 
+     <a href="http://secure.wayport.net/help.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483" class="floatright">Help</a>
+     <div class="dividerright"></div>
+     <a href="http://secure.wayport.net/locations.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483" class="floatright">AT&amp;T&nbsp;Wi&ndash;Fi&nbsp;Locations</a>
+    </div id="rightside"> 
+   </div class="toplinks"> 
+
+   <div class="navbar">
+    <div class="branding"></div>
+    <div class="searchbox"> &nbsp;
+    </div class="searchbox">
+   </div class="navbar"> 
+
+   <div id="index_content" class="content">
+    <div class="contentbox_top"></div>
+    <div class="contentbox_middle">
+
+     <div id="index_leftcolumn" class="leftcolumn">	
+
+      <div id="locationmodule" class="moduleleft">
+       <div class="moduleleft_top"></div>
+       <div class="moduleleft_middle">
+        <div class="modulespacer"> 
+		
+         <div class="location_logo_box">
+          <div class="location_logo"><a target="_new" href="http://wireless.psu.edu/att_redirect.html"><img src="/graphics/aws/cobrand/pennstate_hlocp_v2.jpg" width="128" border="0"/></a></div>
+         </div> 
+         <div class="location_address">
+         <p>You are located at:</p>
+          <h2>Penn State University</h2>
+<p>105 Telecommunication Bldg Bsmt Frame<br/>University Park, PA, 16802-5800</p>
+
+         </div class="location_address">
+        </div class="modulespacer">
+       </div class="moduleleft_middle">
+       <div class="moduleleft_bottom"></div>
+      </div id="locationmodule" class="moduleleft"> 
+
+
+
+
+
+      <script type="text/javascript">
+$(document).ready(function() {
+
+	var buttonclicked = "none";
+	var buttonstate = "closed";
+
+	$(".options_button").click(function(event){
+		thisId = $(event.target).parent().parent().attr("id");
+        formheight = $("#"+thisId+" .options_forms").height() +46;
+                if (buttonstate=="closed"){
+						clickedbutton = "#"+thisId+" .options_box_middle";
+						$(clickedbutton).animate({height: formheight},500);
+                        buttonstate = "open";
+                }else if (buttonstate=="open"&&clickedbutton!="#"+thisId+" .options_box_middle") {
+                        $(clickedbutton).animate({height: "28px"},500);
+                        clickedbutton = "#"+thisId+" .options_box_middle";
+                        $(clickedbutton).animate({height: formheight},500);
+                        buttonstate = "open";
+                } else {
+                        $(clickedbutton).animate({height: "28px"},500);
+                        buttonstate = "closed";
+                }
+
+        });
+});
+      </script>  
+      <div id="connectionoptions" class="moduleleft">
+       <div class="moduleleft_top"></div>
+       <div class="moduleleft_middle">
+        <div class="modulespacer">
+         <div class="title_options"><h1>Get connected to the Internet</h1></div> 
+         <div id="buyaccess" class="options_box">
+          <div class="options_box_top"></div>
+          <div class="options_box_middle">
+           <div class="options_button"><a href="#" class="options_button_text">Buy AT&amp;T Wi-Fi Access</a></div>
+           <div class="options_forms_top"></div>
+           <div class="options_forms">
+
+            <a href="http://secure.wayport.net/help.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483" class="options_helplink">Help?</a> 
+
+<form method="post" action="https://secure.wayport.net/ccform.adp" onsubmit="return validateAWSform(this);">
+<div class="fieldset_wrapper">
+<fieldset class="fieldset_block"><span class="fieldset_title">Please Select the type of service you want to purchase from the menu below and continue:</span class="fieldset_title"> 
+   <select name="NumberOfDays" class="options_forms_dropdown">
+    <option value="1">(1) 24-hour block for &#36;5.99</option>
+   </select>
+
+</fieldset>
+</div class="fieldset_wrapper">
+<div class="fieldset_submitbox"><input name="" type="image" id="CreditCard_submit" value="submit" src="/graphics/aws/laptop/button_continue.png"></div>
+<input type="hidden" name="NmdId" value="27853"/>
+<input type="hidden" name="ReturnHost" value="nmd.pennst01.univepa.wayport.net"/>
+<input type="hidden" name="MacAddr" value="00:17:C4:55:CC:8F"/>
+<input type="hidden" name="IpAddr" value="192.168.47.184"/>
+<input type="hidden" name="NduMacAddr" value=""/>
+<input type="hidden" name="NduPort" value=""/>
+<input type="hidden" name="PortType" value="Wireless"/>
+<input type="hidden" name="PortDesc" value=""/>
+<input type="hidden" name="UseCount" value=""/>
+<input type="hidden" name="PaymentMethod" value="CreditCard"/>
+<input type="hidden" name="ChargeAmount" value=""/>
+<input type="hidden" name="Style" value="AWS"/>
+<input type="hidden" name="vsgpId" value=""/>
+<input type="hidden" name="pVersion" value="2"/>
+<input type="hidden" name="ValidationHash" value="0b4f6a5c50441e470a5db4c9048f311f"/>
+<input type="hidden" name="origDest" value=""/>
+<input type="hidden" name="ProxyHost" value=""/>
+<input type="hidden" name="vsgId" value="101995"/>
+<input type="hidden" name="TunnelIfId" value="363224"/>
+<input type="hidden" name="ts" value="1363820483"/>
+
+</form>
+           </div class="options_forms">
+          </div class="options_box_middle">
+          <div class="options_box_bottom"></div>
+         </div id="buyaccess" class="options_box"> 
+         <div id="customerlogin" class="options_box">
+          <div class="options_box_top"></div>
+          <div class="options_box_middle">
+           <div class="options_button"><a href="#" class="options_button_text">AT&amp;T Customer Login</a></div>
+           <div class="options_forms_top"></div>
+           <div class="options_forms">
+            <a href="http://secure.wayport.net/help.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483" class="options_helplink">Help?</a>
+            <p>AT&amp;T High Speed Internet includes access to AT&amp;T Wi-Fi hotspots.  Just enter your primary email username (Member ID) and password (the same one you use at home). You can also sign in here with your AT&T Wi-Fi Premier account username and password.</p>
+            <form method="post" action="https://secure.wayport.net/sbc/sbc_login.adp" onsubmit="return validateAWSform(this);">
+            <fieldset class="fieldset_leftside">
+             <span class="fieldset_title">Username or Member ID</span class="fieldset_title">
+             <input name="username" type="text" value="" maxlength="30" class="options_forms_input" id="memberid"/>
+             <a href="https://secure3.sbc.com/retrieve_username.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483">Forgot Username?</a> 
+            </fieldset>
+            <fieldset class="fieldset_rightside">
+             <span class="fieldset_title">Domain</span class="fieldset_title">
+
+          <select id="roamRealm" name="roamRealm" class="options_forms_dropdown">
+           <option value="">Make a Selection</option>
+            <option value="attwifi.com">AT&T Wi-Fi</option>
+            <option value="GRIC_ATT">AT&T Remote Access</option>
+            <option value="wayport">Wayport Members</option>
+            <option value="sbcglobal.net">@sbcglobal.net</option>
+            <option value="att.net">@att.net</option>
+            <option value="snet.net">@snet.net</option>
+            <option value="nvbell.net">@nvbell.net</option>
+            <option value="swbell.net">@swbell.net</option>
+            <option value="pacbell.net">@pacbell.net</option>
+            <option value="ameritech.net">@ameritech.net</option>
+            <option value="bellsouth.net">@bellsouth.net</option>
+            <option value="prodigy.net">@prodigy.net</option>
+            <option value="wans.net">@wans.net</option>
+            <option value="flash.net">@flash.net</option>
+          </select>   
+            </fieldset>
+            <fieldset class="fieldset_leftside">
+             <span class="fieldset_title">Password</span class="fieldset_title">
+             <input name="password" type="password" value="" maxlength="30" class="options_forms_input" id="memberpass"/>
+             <a href="https://secure3.sbc.com/retrieve_password.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483">Forgot Password?</a>
+            </fieldset>
+            <div class="fieldset_aup_box">
+             <span class="aup_check">
+              <input id="Membership_aupAgree" type="checkbox" name="aupAgree" value="1"/>
+              <label for="Membership_aupAgree" class="aup_label">I agree to the <a target="_blank" href="http://secure.wayport.net/tosaup.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483">Terms of Service and Acceptable Use Policy</a>.</label>
+             </span>
+             <span class="fieldset_submitbox_aup">
+              <input name="" type="image" id="Membership_submit" value="submit" src="/graphics/aws/laptop/button_getconnected.png">
+             </span>
+            </div class="fieldset_aup_box">
+<input type="hidden" name="NmdId" value="27853"/>
+<input type="hidden" name="ReturnHost" value="nmd.pennst01.univepa.wayport.net"/>
+<input type="hidden" name="MacAddr" value="00:17:C4:55:CC:8F"/>
+<input type="hidden" name="IpAddr" value="192.168.47.184"/>
+<input type="hidden" name="NduMacAddr" value=""/>
+<input type="hidden" name="NduPort" value=""/>
+<input type="hidden" name="PortType" value="Wireless"/>
+<input type="hidden" name="PortDesc" value=""/>
+<input type="hidden" name="UseCount" value=""/>
+<input type="hidden" name="PaymentMethod" value="Membership"/>
+<input type="hidden" name="ChargeAmount" value=""/>
+<input type="hidden" name="Style" value="AWS"/>
+<input type="hidden" name="vsgpId" value=""/>
+<input type="hidden" name="pVersion" value="2"/>
+<input type="hidden" name="ValidationHash" value="e987da5c56a6f63a063db69092e456c5"/>
+<input type="hidden" name="origDest" value=""/>
+<input type="hidden" name="ProxyHost" value=""/>
+<input type="hidden" name="vsgId" value="101995"/>
+<input type="hidden" name="TunnelIfId" value="363224"/>
+<input type="hidden" name="ts" value="1363820483"/>
+
+            </form>
+           </div class="options_forms">
+          </div class="options_box_middle">
+          <div class="options_box_bottom"></div>
+         </div id="customerlogin" class="options_box"> 
+         <div id="coupon" class="options_box">
+          <div class="options_box_top"></div>
+          <div class="options_box_middle">
+           <div class="options_button"><a href="#" class="options_button_text">Login with a Coupon</a></div>
+           <div class="options_forms_top"></div>
+           <div class="options_forms">
+
+            <a href="http://secure.wayport.net/help.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483" class="options_helplink">Help?</a> 
+            <form method="post" action="https://secure.wayport.net/use_coupon.adp" onsubmit="return validateAWSform(this);">
+             <fieldset class="fieldset_leftside">
+              <span class="fieldset_title">Enter Coupon Code</span>
+              <input name="CouponNumber" type="text" value="" maxlength="30" class="options_forms_input" id="couponid">
+             </fieldset>
+             <div class="fieldset_aup_box">
+              <span class="aup_check">
+               <input id="Coupon_aupAgree" type="checkbox" name="aupAgree" value="1"/>
+               <label for="Coupon_aupAgree" class="aup_label">I agree to the <a target="_blank" href="http://secure.wayport.net/tosaup.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483">Terms of Service and Acceptable Use Policy</a>.</label>
+              </span>
+              <span class="fieldset_submitbox_aup">
+               <input name="" type="image" id="account_submit" value="submit" src="/graphics/aws/laptop/button_getconnected.png">
+              </span>
+             </div class="fieldset_aup_box">
+<input type="hidden" name="NmdId" value="27853"/>
+<input type="hidden" name="ReturnHost" value="nmd.pennst01.univepa.wayport.net"/>
+<input type="hidden" name="MacAddr" value="00:17:C4:55:CC:8F"/>
+<input type="hidden" name="IpAddr" value="192.168.47.184"/>
+<input type="hidden" name="NduMacAddr" value=""/>
+<input type="hidden" name="NduPort" value=""/>
+<input type="hidden" name="PortType" value="Wireless"/>
+<input type="hidden" name="PortDesc" value=""/>
+<input type="hidden" name="UseCount" value=""/>
+<input type="hidden" name="PaymentMethod" value="Coupon"/>
+<input type="hidden" name="ChargeAmount" value=""/>
+<input type="hidden" name="Style" value="AWS"/>
+<input type="hidden" name="vsgpId" value=""/>
+<input type="hidden" name="pVersion" value="2"/>
+<input type="hidden" name="ValidationHash" value="2539314706ff8fca2d5714cf1a5b0ce6"/>
+<input type="hidden" name="origDest" value=""/>
+<input type="hidden" name="ProxyHost" value=""/>
+<input type="hidden" name="vsgId" value="101995"/>
+<input type="hidden" name="TunnelIfId" value="363224"/>
+<input type="hidden" name="ts" value="1363820483"/>
+
+            </form>
+           </div class="options_forms">
+          </div class="options_box_middle">
+          <div class="options_box_bottom"></div>
+         </div id="coupon" class="options_box"> 
+        </div class="modulespacer">
+       </div class="moduleleft_middle">
+       <div class="moduleleft_bottom"></div>
+      </div id="connectionoptions" class="moduleleft"> 
+
+
+     </div id="index_leftcolumn" class="leftcolumn"> 
+
+     <div id="index_rightcolumn" class="rightcolumn">	
+
+      <div id="advert" class="moduleright">
+       <div class="moduleright_top"></div>
+       <div class="moduleright_middle_advert">
+        <div class="modulespacer">
+         <div id="jiwire_ad">
+
+<script type="text/javascript" lang="JavaScript">
+ document.write('<script language="JavaScript" type="text/javascript" src="http://tags.jiwire.com/?prid=110670&netid=108-Network&lid=prelog&embed=1&jps=1&pa=1"></scr'+'ipt>');
+</script>
+<noscript>
+ <iframe src="http://tags.jiwire.com/?prid=110670&netid=108-Network&lid=prelog&jps=1&pa=1&noscript=1" scrolling="no" frameborder="0" width="300" height="250"></iframe>
+</noscript> 
+         </div id="jiwire_ad"> 
+        </div class="modulespacer">
+       </div class="moduleright_middle_advert">
+       <div class="moduleright_bottom"></div>
+      </div id="advert" class="moduleright"> 
+
+      <script type="text/javascript">
+	  
+$(document).ready(function() {
+						   
+	$("#one.spotlight_thumb img").animate({opacity: 0.5},50);	   
+	
+	function slide1 () {
+		$("#one.spotlight_img").fadeIn("slow");
+		$("#two.spotlight_img,#three.spotlight_img,#four.spotlight_img").fadeOut("slow");
+		$("#one.spotlight_thumb img").animate({opacity: 0.5},50);
+		$("#two.spotlight_thumb img,#three.spotlight_thumb img,#four.spotlight_thumb img").animate({opacity: 1},50);	
+	}
+	
+	 function slide2 () {
+	$("#one.spotlight_img,#three.spotlight_img,#four.spotlight_img").fadeOut("slow");
+		$("#two.spotlight_img").fadeIn("slow");
+		$("#one.spotlight_thumb img,#three.spotlight_thumb img,#four.spotlight_thumb img").animate({opacity: 1},50);
+		$("#two.spotlight_thumb img").animate({opacity: 0.5},50);	
+	}
+	
+		function slide3 () {
+		$("#one.spotlight_img,#two.spotlight_img,#four.spotlight_img").fadeOut("slow");
+		$("#three.spotlight_img").fadeIn("slow");
+		$("#one.spotlight_thumb img,#two.spotlight_thumb img,#four.spotlight_thumb img").animate({opacity: 1},50);
+		$("#three.spotlight_thumb img").animate({opacity: 0.5},50);
+	}
+	
+		function slide4 () {
+		$("#one.spotlight_img,#two.spotlight_img,#three.spotlight_img").fadeOut("slow");
+		$("#four.spotlight_img").fadeIn("slow");
+		$("#one.spotlight_thumb img,#two.spotlight_thumb img,#three.spotlight_thumb img").animate({opacity: 1},50);
+		$("#four.spotlight_thumb img").animate({opacity: 0.5},50);
+	}
+		
+	function spotlightOne () {
+			slide2();
+			clearInterval(oneInterval);
+			}
+		
+	function spotlightTwo () {
+			slide3();
+			clearInterval(twoInterval);
+			}
+		
+	function spotlightThree () {
+			slide4();
+			clearInterval(threeInterval);
+			}
+	
+	function spotlightFour () {
+			slide1();
+			clearInterval(fourInterval);
+			}
+	function setSpotlightIntervals () {
+		oneInterval = setInterval(spotlightOne,6000);
+		twoInterval = setInterval(spotlightTwo,12000);
+		threeInterval = setInterval(spotlightThree,18000);
+		fourInterval = setInterval(spotlightFour,24000);
+	}
+	
+	setSpotlightIntervals();
+	setInterval(function() {
+		setSpotlightIntervals();
+	},24000);
+		
+							   
+	$("#one.spotlight_thumb img").click(function () {
+	slide1();
+	});
+	
+	$("#two.spotlight_thumb img").click(function () {
+	slide2();
+	});
+	
+	$("#three.spotlight_thumb img").click(function () {
+	slide3();
+	});
+	
+	$("#four.spotlight_thumb img").click(function () {
+	slide4();
+	});	
+	
+$("#one.spotlight_thumb img,#two.spotlight_thumb img,#three.spotlight_thumb img,#four.spotlight_thumb img").mouseover(function () {
+	$(this).animate({width: "76px",height: "44px", marginLeft: "-=3px", marginTop: "-=3px"},60, "linear", function() {
+		$(this).parent().css({"border-color":"#fff"});
+		});
+	});
+
+
+$("#one.spotlight_thumb img,#two.spotlight_thumb img,#three.spotlight_thumb img,#four.spotlight_thumb img").mouseout(function () {
+	$(this).animate({width: "70px",height: "38px", marginLeft: "+=3px", marginTop: "+=3px"},50, "linear", function() {
+		$(this).parent().css({"border-color":"#999"});
+		});
+});
+});
+      </script> 
+      <div id="spotlight" class="moduleright">
+       <div class="moduleright_tab" id="test">AT&amp;T Wi-Fi Spotlight</div>
+       <div class="moduleright_middle">
+        <div id="spotlight_window" class="modulespacer">
+         <div class="test_container">
+          <div id="one" class="spotlight_img"><a href="http://clk.atdmt.com/CNT/go/140081887/direct/01/"><img src="/graphics/aws/laptop/spotlight_AWS.jpg" width="300" height="167" border="0"></a></div>
+          <div id="two" class="spotlight_img"><a href="http://www.att.com/u-verse/shop/index.jsp?shopFilterId=100004"><img src="/graphics/aws/laptop/ATT_Uverse.jpg" width="300" height="167" border="0"></a></div>
+          <div id="three" class="spotlight_img"><a href="http://clk.atdmt.com/CNT/go/140550463/direct/01/"><img src="/graphics/aws/laptop/spotlight_AWS.jpg" width="300" height="167" border="0"></a></div>
+          <div id="four" class="spotlight_img"><a href="http://www.att.com/u-verse/shop/index.jsp?shopFilterId=100004"><img src="/graphics/aws/laptop/ATT_Uverse.jpg" width="300" height="167" border="0"></a></div>
+         </div>
+         <div class="spotlight_navbar">
+          <div id="one" class="spotlight_thumb"><img src="/graphics/aws/laptop/spotlight_AWS_th.jpg" width="70" height="38" border="0"></div>
+          <div id="two" class="spotlight_thumb"><img src="/graphics/aws/laptop/ATT_Uverse_th.jpg" width="70" height="38" border="0"></div>
+          <div id="three" class="spotlight_thumb"><img src="/graphics/aws/laptop/spotlight_AWS_th.jpg" width="70" height="38" border="0"></div>
+          <div id="four" class="spotlight_thumb"><img src="/graphics/aws/laptop/ATT_Uverse_th.jpg" width="70" height="38" border="0"></div>
+         </div>
+        </div class="modulespacer">
+       </div class="moduleright_middle">
+       <div class="moduleright_bottom"></div>
+      </div id="spotlight" class="moduleright"> 
+
+     </div id="index_rightcolumn" class="rightcolumn"> 
+	
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $(".rightcolumn").show();
+        });
+        </script>  
+
+    </div class="contentbox_middle">
+    <div class="contentbox_bottom"></div>
+   </div id="index_content" class="content"> 
+
+  </div id="index_page" class="page"> 
+
+  <div id="index_footer_footer" class="footer">
+
+
+ <div class="footer_bar">
+  <img src="/graphics/aws/laptop/footer/footer_logo.png" alt="footer_logo" width="116" height="23"/><img src="/graphics/aws/laptop/footer/footer_tag.png" alt="footer_tag" width="122" height="23"/><a href="http://www.att.com"><img src="/graphics/aws/laptop/footer/footer_com.png" alt="footer_com" width="197" height="23" border="0"/></a><img src="/graphics/aws/laptop/footer/footer_net.png" alt="footer_net" width="198" height="23" border="0"/>
+ </div>
+ <ul>
+  <li class="footer_cell"><a href="http://secure.wayport.net/tosaup.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483">Terms and Conditions</a><img src="/graphics/aws/laptop/footer/footer_divider.gif" alt="footer_divider" width="3" height="12"/></li>
+  <li class="footer_cell"><a href="http://www.att.com/gen/privacy-policy?pid=2506">Privacy Policy</a><img src="/graphics/aws/laptop/footer/footer_divider.gif" alt="footer_divider" width="3" height="12"/></li>
+  <li class="footer_cell"><a href="http://secure.wayport.net/help.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483">Help</a><img src="/graphics/aws/laptop/footer/footer_divider.gif" alt="footer_divider" width="3" height="12"/></li>
+  <li class="footer_cell"><a href="http://secure.wayport.net/locations.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483">Wi-Fi Locations</a></li>
+ </ul>
+ <p><a href="http://www.att.com/gen/privacy-policy?pid=2587">&copy;2013 AT&amp;T Intellectual Property</a>. All rights reserved. AT&amp;T, the AT&amp;T logo and all other AT&amp;T marks contained herein are trademarks of AT&amp;T Intellectual Property and/or AT&amp;T affiliated companies.<br>IP Address: 192.168.47.184 | Mac Address 00:17:C4:55:CC:8F</p>
+
+  </div id="index_footer_footer" class="footer"> 
+
+  <img width="1" height="1" alt="" src="http://secure.wayport.net/add-ins/aws/tv.adp?ProxyHost=&UserAgent=R+%282%2e15%2e1+i386%2dpc%2dmingw32+i386+mingw32%29&TunnelIfId=363224&NmdId=27853&ReturnHost=nmd%2epennst01%2eunivepa%2ewayport%2enet&MacAddr=00%3a17%3aC4%3a55%3aCC%3a8F&IpAddr=192%2e168%2e47%2e184&NduMacAddr=&NduPort=&PortType=Wireless&PortDesc=&UseCount=&PaymentMethod=&ChargeAmount=&Style=AWS&vsgpId=&pVersion=2&ValidationHash=8538d9253f6d599671332ee04d16a2e8&origDest=&ProxyHost=&vsgId=101995&ts=1363820483&MainDivId=index"/>
+ </body>
+</html> 
+
