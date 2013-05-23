@@ -61,15 +61,9 @@ for(fileNumber in 0:(nFiles-1)){
 colnames(obs.xts) <- c('zone','obs')
 
 # Make xts object containting all load forecasts ---------------------
+# ...
 
-
-
-
-
-
-
-
-
+# Save object for use in later analytic tasks
 save(obs.xts,file='obs.rda')
 
 
