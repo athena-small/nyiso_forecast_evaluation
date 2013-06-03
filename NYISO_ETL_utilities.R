@@ -1,7 +1,7 @@
 # File NYISO_ETL_utilities.R
 # A set of utility functions that perform basic tasks related to extracting and 
 # transforming NYISO load forecast and observation data. 
-# Written by A.A. Small, 2013-03
+# Created by A.A. Small, 2013-03
 
 
 #  Function emptyFctsList():
@@ -158,7 +158,7 @@ forecastUpdates <- function(errors.xts,nLags=6,IDCols=c(1)){
      u.xts <- errors.xts[,2:nLags+1]-errors.xts[,2:nLags]
      updates.xts <- merge(scaffold.xts,u.xts)
      updates.xts <- merge(updates.xts,errors.xts[,nLags+1])
-     colNames <- paste('lag',nLags:1,'->',(nLags:1)-1,sep='')
+     colNames <- paste('lag',nLags:1,'.',(nLags:1)-1,sep='')
      colnames(updates.xts) <- c('zone',colNames)
      return(updates.xts)
 }

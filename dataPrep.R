@@ -89,7 +89,7 @@ for(fileCount in 0:(nFiles-1)){
 
 # Create xts objects of load forecasting errors and updates
 errors.xts <- forecastErrors(forecasts.xts,obs.xts,obsCol=2,fcstCols=(1+1:nLags),IDCols=1)
-updates.xts <- forecastUpdates(errors.xts,nLags=nLags,IDCols=1)
+updates.xts <- forecastUpdates(errors.xts,nLags=6,IDCols=1)
 
 # Save the new xts objects in an R data file
 list=c('forecasts.xts','obs.xts','errors.xts','updates.xts')
