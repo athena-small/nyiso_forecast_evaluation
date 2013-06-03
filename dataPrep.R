@@ -9,33 +9,32 @@ source('NYISO_ETL_utilities.R')
 
 # Initialize parameters ---------------------------------------------------
 
-load('zoneData.rda')
+load('zoneData.rda')  # Index of names and ID#'s for NYISO's eleven zones
 
-timeZone <- 'America/New_York'
+timeZone        <- 'America/New_York'
 Sys.setenv(TZ=timeZone)
-seriesStartDate <- ISOdate(2012,10,1,0,0,0,tz=timeZone)
-seriesEndDate   <- ISOdate(2013,2,25,0,0,0,tz=timeZone)
-SecsPerHr <- 3600 
+seriesStartDate <- ISOdate(2012,10,01,0,0,0,tz=timeZone)
+seriesEndDate   <- ISOdate(2013,02,10,0,0,0,tz=timeZone)
+SecsPerHr       <- 3600 
 
-nZones <- nrow(zoneData)  # Number of NYISO load control zones
-nLags <-  6               # Number of days of forecasts in each NYISIO forecast file
+nZones          <- nrow(zoneData)  # Number of NYISO load control zones
+nLags           <- 6               # Number of days of forecasts in each NYISO forecast file
+maxHrsAhead     <- nLags*24+1   # Extra hour needed for annual DST transitions
+nFiles          <- as.integer(seriesEndDate - seriesStartDate)+1
 
 # Locations of NYISO forecast and load files
-fcstDirURL <- "http://mis.nyiso.com/public/csv/isolf/"
-obsDirURL  <- "./Data/"
-# obsDirURL <- "http://mis.nyiso.com/public/csv/palIntegrated/"
-
+fcstDirURL      <- "http://mis.nyiso.com/public/csv/isolf/"
+obsDirURL       <- "../Data/"
+#obsDirURL      <- "http://mis.nyiso.com/public/P-58Clist.htm"
 
 # Begin main program ------------------------------------------------------
 
-#  Prepare object 'recentFcsts' in which to store forecasts in between their respective "issued on" dates and "valid for" dates. 'recentFcsts' is structured as a list of data frames, one for each lag in 1:nLags
-
-maxHrsAhead   <- nLags*24+1   # Extra hour needed for annual DST transitions
-
+#  Prepare object 'recentFcsts' in which to store forecasts in between their respective "issued on" dates and "valid for" dates. 
+#  'recentFcsts' is structured as a list of data frames, one for each lag in 1:nLags
 recentFcsts <- emptyFcstList(nLags=nLags,nrow=maxHrsAhead,ncol=nZones,colnames=zoneData$names,periodName='hour',lagsAreCalled='days')
 
-nFiles <- as.integer(seriesEndDate - seriesStartDate)+1
 today  <- seriesStartDate
+
 for(fileCount in 0:(nFiles-1)){
 
      # Fetch today's obs, re-format as an xts object
@@ -77,17 +76,35 @@ for(fileCount in 0:(nFiles-1)){
      #  - shift forecasts over by 1 lag
      #  - shift all rows up nHrs rows
      #  - set all other cells to NA
-     if(nLags > 1){
-          recentFcsts[2:nLags] <- recentFcsts[1:(nLags-1)]     
-          newRows <- 1:(maxHrsAhead-nHrs)
-          oldRows <- (1+nHrs):maxHrsAhead
-          lapply(2:nLags, function(lag){
-               recentFcsts[[lag]][newRows,] <- recentFcsts[[lag]][oldRows,]
-               recentFcsts[[lag]][-newRows,1:nZones] <- NA
-          } )          
+     oldRows <- (1+nHrs):maxHrsAhead
+     newRows <- 1:(maxHrsAhead-nHrs)
+     for(lag in (nLags-1):1){
+          recentFcsts[[lag+1]][newRows,1:nZones] <- recentFcsts[[lag]][oldRows,1:nZones]
+          recentFcsts[[lag+1]][-newRows,1:nZones] <- NA                         
      }
+     
+#      lapply((nLags-1):1, function(lag){
+#           recentFcsts[[lag+1]][newRows,1:nZones] <- recentFcsts[[lag]][oldRows,1:nZones]
+#           recentFcsts[[lag+1]][-newRows,1:nZones] <- NA                                   
+#      })
+#      
      recentFcsts[[1]][1:maxHrsAhead,1:nZones] <- NA
      
+
+#      if(nLags > 1){
+#           recentFcsts[2:nLags] <- recentFcsts[1:(nLags-1)]     
+#           oldRows <- (1+nHrs):maxHrsAhead
+#           newRows <- 1:(maxHrsAhead-nHrs)
+#           for(lag in 2:nLags){
+#                recentFcsts[[lag]][newRows,1:nZones] <- recentFcsts[[lag]][oldRows,1:nZones]
+#                recentFcsts[[lag]][-newRows,1:nZones] <- NA               
+#           }
+#           lapply(2:nLags, function(lag){
+#                recentFcsts[[lag]][newRows,] <- recentFcsts[[lag]][oldRows,]
+#                recentFcsts[[lag]][-newRows,1:nZones] <- NA
+#           } )          
+#     }
+        
      # Advance the clock by one day
      today <- today + nHrs*SecsPerHr
 }
@@ -105,5 +122,12 @@ list=c('forecasts.xts','obs.xts','errors.xts')
 
 
 save(list=list,file='NYISO_load_forecast_evaluation_dataset.rda')
+
+# forecastsTail.df <- as.data.frame(tail(forecasts.xts,3000))
+# write.csv(forecastsTail.df,file='forecastsTail.csv')
+# obsTail.df <- as.data.frame(tail(obs.xts,3000))
+# write.csv(obsTail.df,file='obsTail.csv')
+# errorsTail.df <- as.data.frame(tail(errors.xts,3000))
+# write.csv(errorsTail.df,file='errorsTail.csv')
 
 # ######### END OF CODE ############

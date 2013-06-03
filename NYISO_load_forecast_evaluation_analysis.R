@@ -13,12 +13,27 @@ Sys.setenv(TZ=timeZone)
 
 ## CURRENTLY THIS FILE IS JUST A SET OF EXAMPLE OPERATIONS ####
 #  To see index of zone IDs, enter "zoneData" at the '>' prompt 
-
+zoneData
 # # Select out subset: loads for N.Y.C., 5:00 p.m. on weekdays
-subset <- forecasts.xts[.indexhour(forecasts.xts)==17 & forecasts.xts$zone==61761 & .indexwday(forecasts.xts) %in% 1:5]
+subset.xts <- forecasts.xts[.indexhour(forecasts.xts)==0 & forecasts.xts$zone==61761]
 
-head(subset,20)
 
+subset.xts <- subset.xts['2012-11']
+
+subset.xts
+subset.df <- as.data.frame(subset.xts)
+
+
+coredata(subset.xts,rownames=.index(subset.xts))
+.index(subset.xts)
+
+length(coredata(subset.xts))
+
+
+matrix(.index(subset.xts),coredata(subset.xts))
+subset.df <- as.data.frame[subset.xts]
+
+head(subset.xts,20)
 l1 <- subset[,'lag1']
 
 main = 'Effects of Hurricane Sandy on the accuracy of NYISO day-ahead load forecasts'
@@ -30,7 +45,6 @@ hist(l1,201,xlim=c(-500,500))
 
 # hist(x, 50)
 # plot(x,main="Electricity consumption by N.Y.C. 5-6p.m. weekdays",ylab="MW")
-# 
 # plot(forecasts.xts[forecasts.xts$zone==61761]['T17:00/T17:01']$obs)
 
 # Tests to make sure output is OK
@@ -68,14 +82,20 @@ f <- forecasts.xts[forecasts.xts$zone==61761 & index(forecasts.xts)$hour==17]['2
 f
 
 e <- errors.xts[errors.xts$zone==61761 & index(errors.xts)$hour==17]
-hist(e[,'lag6'],e[,'lag1'])
+hist(e[,'lag6'],20)
+sqrt(var(e['2012-10-06/']))
+plot(e$lag1, ylim=c(-1500,2000))
+plot(e$lag2, ylim=c(-1500,2000))
+plot(e$lag3, ylim=c(-1500,2000))
+plot(e$lag4, ylim=c(-1500,2000))
+plot(e$lag5, ylim=c(-1500,2000))
+plot(e$lag6, ylim=c(-1500,2000))
+
+is.na(e)
+e <- e[is.na(e)==FALSE]
+var(e)
 plot(hist(e[,'lag6']))
 names(errors.xts)
 
 head(errors.xts)
 tail(errors.xts)
-
-theta=seq(0,pi/2,length=101)
-leaf=sin(2*theta)+.25*sin(6*theta)
-thing <- for(k in 0:3) polygon(leaf*cos(theta+k*pi/2),leaf*sin(theta+k*pi/2),col="green")
-plot(thing, xlim=c(-1,1),ylim=c(-1,1),ylab='Happy',xlab='St. Patrick\'s Day!')
