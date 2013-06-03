@@ -152,6 +152,16 @@ forecastErrors <- function(fcsts.xts,obs.xts,obsCol=2,fcstCols=c(2),IDCols=c(1))
      return(errors.xts)
 }
 
+forecastUpdates <- function(errors.xts,nLags=6,IDCols=c(1)){
+     require(xts)
+     scaffold.xts <- errors.xts[,IDCols]
+     u.xts <- errors.xts[,2:nLags+1]-errors.xts[,2:nLags]
+     updates.xts <- merge(scaffold.xts,u.xts)
+     updates.xts <- merge(updates.xts,errors.xts[,nLags+1])
+     colNames <- paste('lag',nLags:1,'->',(nLags:1)-1,sep='')
+     colnames(updates.xts) <- c('zone',colNames)
+     return(updates.xts)
+}
 
 
 ########## END OF CODE ############

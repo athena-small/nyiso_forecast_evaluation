@@ -71,8 +71,7 @@ for(fileCount in 0:(nFiles-1)){
           forecasts.xts <- rbind(forecasts.xts,fcstsValidToday.xts)
      }
      
-     # Prepare for next day's data: 
-     # If(nLags > 1) then: In recentFcsts list:
+     # Prepare for next day's data: In recentFcsts list
      #  - shift forecasts over by 1 lag
      #  - shift all rows up nHrs rows
      #  - set all other cells to NA
@@ -82,45 +81,18 @@ for(fileCount in 0:(nFiles-1)){
           recentFcsts[[lag+1]][newRows,1:nZones] <- recentFcsts[[lag]][oldRows,1:nZones]
           recentFcsts[[lag+1]][-newRows,1:nZones] <- NA                         
      }
-     
-#      lapply((nLags-1):1, function(lag){
-#           recentFcsts[[lag+1]][newRows,1:nZones] <- recentFcsts[[lag]][oldRows,1:nZones]
-#           recentFcsts[[lag+1]][-newRows,1:nZones] <- NA                                   
-#      })
-#      
      recentFcsts[[1]][1:maxHrsAhead,1:nZones] <- NA
-     
 
-#      if(nLags > 1){
-#           recentFcsts[2:nLags] <- recentFcsts[1:(nLags-1)]     
-#           oldRows <- (1+nHrs):maxHrsAhead
-#           newRows <- 1:(maxHrsAhead-nHrs)
-#           for(lag in 2:nLags){
-#                recentFcsts[[lag]][newRows,1:nZones] <- recentFcsts[[lag]][oldRows,1:nZones]
-#                recentFcsts[[lag]][-newRows,1:nZones] <- NA               
-#           }
-#           lapply(2:nLags, function(lag){
-#                recentFcsts[[lag]][newRows,] <- recentFcsts[[lag]][oldRows,]
-#                recentFcsts[[lag]][-newRows,1:nZones] <- NA
-#           } )          
-#     }
-        
      # Advance the clock by one day
      today <- today + nHrs*SecsPerHr
 }
 
-# Create an xts object of load forecasting errors
+# Create xts objects of load forecasting errors and updates
 errors.xts <- forecastErrors(forecasts.xts,obs.xts,obsCol=2,fcstCols=(1+1:nLags),IDCols=1)
-
-
-# To be added later: Create an xts object of forecast refinements
-# updates.xts <- diffs(errors.xts)  # Still need to write this function
+updates.xts <- forecastUpdates(errors.xts,nLags=nLags,IDCols=1)
 
 # Save the new xts objects in an R data file
-list=c('forecasts.xts','obs.xts','errors.xts')
-# list=c('fcsts.xts','obs.xts','errors.xts','updates.xts')
-
-
+list=c('forecasts.xts','obs.xts','errors.xts','updates.xts')
 save(list=list,file='NYISO_load_forecast_evaluation_dataset.rda')
 
 # forecastsTail.df <- as.data.frame(tail(forecasts.xts,3000))
