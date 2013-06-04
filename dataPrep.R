@@ -13,8 +13,8 @@ load('zoneData.rda')  # Index of names and ID#'s for NYISO's eleven zones
 
 timeZone        <- 'America/New_York'
 Sys.setenv(TZ=timeZone)
-seriesStartDate <- ISOdate(2012,10,01,0,0,0,tz=timeZone)
-seriesEndDate   <- ISOdate(2013,02,10,0,0,0,tz=timeZone)
+seriesStartDate <- ISOdate(2005,01,01,0,0,0,tz=timeZone)
+seriesEndDate   <- ISOdate(2013,05,31,0,0,0,tz=timeZone)
 SecsPerHr       <- 3600 
 
 nZones          <- nrow(zoneData)  # Number of NYISO load control zones
@@ -23,8 +23,8 @@ maxHrsAhead     <- nLags*24+1   # Extra hour needed for annual DST transitions
 nFiles          <- as.integer(seriesEndDate - seriesStartDate)+1
 
 # Locations of NYISO forecast and load files
-fcstDirURL      <- "http://mis.nyiso.com/public/csv/isolf/"
-obsDirURL       <- "../Data/"
+# fcstDirURL      <- "http://mis.nyiso.com/public/csv/isolf/"
+# obsDirURL       <- "../CK/nyiso_forecast_evaluation/Data/"
 #obsDirURL      <- "http://mis.nyiso.com/public/P-58Clist.htm"
 
 # Begin main program ------------------------------------------------------
