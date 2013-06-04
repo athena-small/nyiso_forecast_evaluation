@@ -69,7 +69,7 @@ getOneDaysObs <- function(date,dirURL='./Data/'){
      Yr  <- strftime(date,format='%Y')
      Mo  <- strftime(date,format='%m')
      Day <- strftime(date,format='%d')
-     file <- paste(dirURL,Yr,Mo,"01palIntegrated_csv/",Yr,Mo,Day,"palIntegrated.csv", sep="")
+     file <- paste(dirURL,Yr,Mo,Day,"palIntegrated.csv", sep="")
      asIsCols = c(1,3)   # Don't convert Time.Stamps or zone names to factors
      obs.df <- read.table(file,header=TRUE,sep=",",as.is=asIsCols)
      
