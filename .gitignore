@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 Rplot.png
+test.csv
+obsTail.csv
+errorsTail.csv
+forecastsTail.csv
