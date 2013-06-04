@@ -132,7 +132,7 @@ fcstList2xts <- function(fcsts.list,scaffold.xts){
 #  * The obs and fcst xts objects must share the same dateTime index variable;
 #  * Each row in obs.xts must contain exactly one observation value
 #  * Each row of fcsts.xts must contain forecast values that share a common 'valid for' dateTime for the observation with the corresponding row number and dateTime index value. 
-# 
+
 # Comments: 
 #    Rolling forecast series or ensemble forecasts may be accommodated by choosing a 'fcstCols' vector with more than one column value.  
 #    
