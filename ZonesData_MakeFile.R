@@ -1,4 +1,4 @@
-#  File makeZonesDataFile.R
+#  File ZonesData_MakeFile.R
 #  A utility program for making file zoneData.rda that contains all parameters
 #  pertinent to the eleven NYISO zones.
 #  Created by A.A. Small, 2013-03
@@ -19,7 +19,5 @@ zoneData <- read.table(obsURL,header=TRUE,sep=",",nrows=nZones,as.is=c(1))[1:nZo
 colnames(zoneData) <- c('names','IDs')
 zoneData$names <- capwords(as.character(zoneData$names),strict=TRUE)
 zoneData$names[9] <- 'N.Y.C.'
-
-str(zoneData)
 
 save(zoneData,file='zoneData.rda')
