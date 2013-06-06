@@ -3,18 +3,19 @@
 #  By A.A. Small, 2013-03/2013-06
 #  Written in conjunction with article, "Are load forecasters rational?"
 
-
 # Load packages and datasets ----------------------------------------------
 
-# Provides support for eXtensible Time Series (xts) objects
+# Provides support for eXtensible Time Series (xts) objects:
 library(xts)
-
-# Package "xtsExtra" provides additional plotting support for xts objects
+# Provides additional plotting support for xts objects:
 # install.packages("xtsExtra", repos='http://r-forge.r-project.org')
 library(xtsExtra)
+# Provides support for NERC/NYISO holidays:
+library(timeDate)    
+# Provides support for handy date-time utilities:
+library(lubridate)
+# Provides support for graphics:
 library(graphics)
-
-
 
 # Load datasets prepared previously ---------------------------------------
 
@@ -30,47 +31,68 @@ Sys.setenv(TZ=timeZone)
 
 # CREATE LABELS FOR VARIOUS SUBSETS OF THE DATA SERIES  ----------
 
+# Create a set of logical (TRUE/FALSE) vectors that pick out specific data subsets
 ###  Legend:
 ### Subsetting by NYISO load zone:
 #  *.xts$zone==61761 : data for New York City
 NYC <- obs.xts$zone==61761
 
 ### Subsetting by time:
-# > attributes(index(forecasts.xts))$names
+# 'Time' is a vector of POSIXlt date-time objects spanning the period of record
+#  Each element in Times corresponds to the start of one hour in the series
+Time <- index(obs.xts)
+
+# > attributes(Time)$names
 # [1] "sec"   "min"   "hour"  "mday"  "mon"   "year"  "wday"  "yday"  "isdst"
 
 ###  Subsetting by time of day:
-#  index(*.xts)$hour==17  : data for Hour 17, a.k.a. 5:00-5:59 p.m.
-Hr17 <- index(obs.xts)$hour==17
-Hr00 <- index(obs.xts)$hour==0
+#  index(*.xts)$hour==17  : 
+Hr17 <- hour(Time)==17 # Hour 17, a.k.a. 5:00-6:00 p.m.
+Hr00 <- hour(Time)==0  # dat
 
-#  all peak-load hours
-
-#  all off-peak hours
-
-### Subsetting by day of the week, or workdays vs. weekends:
-#    Weekdays, Monday - Friday
-Weekdays <- index(obs.xts) %in% 1:5
-
+Time
+### Subsetting by peak load vs. off-peak hours
+# Definitions:
+#    Off-Peak: The hours between 11:00 p.m. and 7:00 a.m., prevailing
+# Eastern Time, Monday through Friday, and all day Saturday and Sunday, and
+# NERC-defined holidays, or as otherwise decided by ISO.
+#    On-Peak: The hours between 7:00 a.m. and 11:00 p.m. inclusive, prevailing
+# Eastern Time, Monday through Friday, except for NERC-defined holidays, or as
+# otherwise decided by the ISO
+#    Source: http://www2.econ.iastate.edu/tesfatsi/NYISOGlossary.14Oct2011.pdf
+# There are six identified U.S. holidays each year:
+# • New Year’s Day 
+# • Memorial Day 
+# • Independence Day 
+# • Labor Day 
+# • Thanksgiving Day 
+# • Christmas Day
+# Source: http://www.naesb.org/pdf/weq_iiptf050504w6.pdf
+PeakHours <- hour(Time) %in% 7:22   # 7:00 a.m. - 11:00 p.m.
+Weekdays  <- wday(Time) %in% 1:5    # Monday - Friday
+Holidays  <- yday(Time) %in% yday(holidayNERC())
+onPeak    <- PeakHours & Weekdays & !Holidays
 
 ### Subsetting by season:
-#   cooling season, months May - September
-
-#   heating season, months Nov - March
+Spring <- month(Time) %in% 3:5
+Summer <- month(Time) %in% 6:8
+Fall   <- month(Time) %in% 9:11
+Winter <- month(Time) %in% c(12,1,2)
 
 #   Daylight Savings Time versus Standard Time
-DST <- index(obs.xts)$isdst
+DST <- Time$isdst
 
 
 # GENERATE SUMMARY STATISTICS AND PLOTS -----------------------------------
 
 # Realized loads for NYC, 5-6p.m. on weekdays
-plot(obs.xts[NYC & Hr17 & Weekdays]$obs)
+plot(obs.xts[onPeak & NYC & Hr17]$obs)
 
-min(obs.xts[NYC & Hr17 & Weekdays]$obs)
+min(obs.xts[NYC & Hr17 & onPeak]$obs)
 
 #  - Forecast updates for New York City (zone ID 61761), hour 17 (5:00-6:00 p.m)
-x <- updates.xts[NYC & Hr17][,2:7]
+
+x <- updates.xts[NYC & Hr17 & onPeak][,2:7]
 
 plot(x, screens=1:6)
 colMeans(x,na.rm=TRUE)

@@ -54,3 +54,21 @@
 #  updates.xts$lagN.N-1 : difference between corresponding values for 
 #                         forecasts.xts$lagN and forecasts.xts$lagN-1
 #  updates.xts$lag1.0   : same as errors.xts$lag1                     
+
+
+# Definition of On-Peak versus Off-Peak hours:
+#    Off-Peak: The hours between 11:00 p.m. and 7:00 a.m., prevailing
+# Eastern Time, Monday through Friday, and all day Saturday and Sunday, and
+# NERC-defined holidays, or as otherwise decided by ISO.
+#    On-Peak: The hours between 7:00 a.m. and 11:00 p.m. inclusive, prevailing
+# Eastern Time, Monday through Friday, except for NERC-defined holidays, or as
+# otherwise decided by the ISO
+#    Source: http://www2.econ.iastate.edu/tesfatsi/NYISOGlossary.14Oct2011.pdf
+# There are six identified U.S. holidays each year:
+# • New Year’s Day 
+# • Memorial Day 
+# • Independence Day 
+# • Labor Day 
+# • Thanksgiving Day 
+# • Christmas Day
+# Source: http://www.naesb.org/pdf/weq_iiptf050504w6.pdf
