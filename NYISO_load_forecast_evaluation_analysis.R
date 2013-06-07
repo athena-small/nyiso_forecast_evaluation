@@ -7,6 +7,7 @@
 
 # Provides support for eXtensible Time Series (xts) objects:
 library(xts)
+library(zoo)
 # Provides additional plotting support for xts objects:
 # install.packages("xtsExtra", repos='http://r-forge.r-project.org')
 library(xtsExtra)
@@ -32,63 +33,41 @@ Sys.setenv(TZ=timeZone)
 # CREATE LABELS FOR VARIOUS SUBSETS OF THE DATA SERIES  ----------
 
 # Create a set of logical (TRUE/FALSE) vectors that pick out specific data subsets
-###  Legend:
+
 ### Subsetting by NYISO load zone:
-#  *.xts$zone==61761 : data for New York City
-NYC <- obs.xts$zone==61761
+NYC <- obs.xts$zone==61761      # Picks out records with data for New York City
 
 ### Subsetting by time:
 # 'Time' is a vector of POSIXlt date-time objects spanning the period of record
 #  Each element in Times corresponds to the start of one hour in the series
 Time <- index(obs.xts)
 
-# > attributes(Time)$names
-# [1] "sec"   "min"   "hour"  "mday"  "mon"   "year"  "wday"  "yday"  "isdst"
-
-###  Subsetting by time of day:
-#  index(*.xts)$hour==17  : 
+#  Subsetting by time of day:
 Hr17 <- hour(Time)==17 # Hour 17, a.k.a. 5:00-6:00 p.m.
-Hr00 <- hour(Time)==0  # dat
+Hr00 <- hour(Time)==0  # 
 
-Time
-### Subsetting by peak load vs. off-peak hours
-# Definitions:
-#    Off-Peak: The hours between 11:00 p.m. and 7:00 a.m., prevailing
-# Eastern Time, Monday through Friday, and all day Saturday and Sunday, and
-# NERC-defined holidays, or as otherwise decided by ISO.
-#    On-Peak: The hours between 7:00 a.m. and 11:00 p.m. inclusive, prevailing
-# Eastern Time, Monday through Friday, except for NERC-defined holidays, or as
-# otherwise decided by the ISO
-#    Source: http://www2.econ.iastate.edu/tesfatsi/NYISOGlossary.14Oct2011.pdf
-# There are six identified U.S. holidays each year:
-# • New Year’s Day 
-# • Memorial Day 
-# • Independence Day 
-# • Labor Day 
-# • Thanksgiving Day 
-# • Christmas Day
-# Source: http://www.naesb.org/pdf/weq_iiptf050504w6.pdf
+# Subsetting by peak load vs. off-peak hours
+#   (For definition, see README.txt)
 PeakHours <- hour(Time) %in% 7:22   # 7:00 a.m. - 11:00 p.m.
 Weekdays  <- wday(Time) %in% 1:5    # Monday - Friday
 Holidays  <- yday(Time) %in% yday(holidayNERC())
 onPeak    <- PeakHours & Weekdays & !Holidays
 
-### Subsetting by season:
+# Subsetting by season:
 Spring <- month(Time) %in% 3:5
 Summer <- month(Time) %in% 6:8
 Fall   <- month(Time) %in% 9:11
 Winter <- month(Time) %in% c(12,1,2)
 
 #   Daylight Savings Time versus Standard Time
-DST <- Time$isdst
-
+DST <- dst(Time)
 
 # GENERATE SUMMARY STATISTICS AND PLOTS -----------------------------------
 
 # Realized loads for NYC, 5-6p.m. on weekdays
-plot(obs.xts[onPeak & NYC & Hr17]$obs)
+plot(obs.xts[onPeak & NYC & Hr17 & Summer]['2012']$obs)
 
-min(obs.xts[NYC & Hr17 & onPeak]$obs)
+min(obs.xts[NYC & onPeak & Summer]$obs)
 
 #  - Forecast updates for New York City (zone ID 61761), hour 17 (5:00-6:00 p.m)
 
@@ -107,10 +86,22 @@ head(is.na(as.matrix(x)[,]))
 
 nrow(is.na(as.matrix(x)))
 
-mean(!is.na(x))
+xNArows <- union(index(x[is.na(x[,1])]),index(x[is.na(x[,2])]))
+mean(x[!xNAs,1])
+x[!is.na(x)]
 
+na.rm()
+y1 <- na.fill(as.zoo(x),'extend')
+mean(y1)
+dim(y1)
+dim(x)
+y <- as.xts(y1)
+y[!x==y]
 
+z <- zoo(c(NA, 2, NA, 1, 4, 5, 2, NA))
+na.fill(z, "extend")
 
+mean(y)
 sapply(x[!is.na(x)],mean)
 is.na(x)[,1]==TRUE
 
