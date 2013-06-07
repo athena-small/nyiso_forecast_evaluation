@@ -69,14 +69,46 @@ plot(obs.xts[onPeak & NYC & Hr17 & Summer]['2012']$obs)
 
 min(obs.xts[NYC & onPeak & Summer]$obs)
 
-#  - Forecast updates for New York City (zone ID 61761), hour 17 (5:00-6:00 p.m)
+NYCpeakLoads <- obs.xts[NYC & onPeak]$obs
+tail(NYCpeakLoads)
+str(NYCpeakLoads)
+dim(NYCpeakLoads)
 
-x <- updates.xts[NYC & Hr17 & onPeak][,2:7]
+obs.xts
+tail(NYC)
+tail(onPeak)
+tail(NYC & onPeak, 25)
+
+tail(month(index(NYCpeakLoads)))
+NYCpeak <- NYCpeakLoads[!is.na(NYCpeakLoads)]
+
+tapply(NYCpeak,INDEX=month(index(NYCpeak)),mean)/sqrt(tapply(NYCpeak,INDEX=month(index(NYCpeak)),var))
+max(obs.xts[NYC & Hr17 & onPeak & Summer]$obs, na.rm=TRUE)
+
+
+#  - Forecast updates for New York City (zone ID 61761), hour 17 (5:00-6:00 p.m), on-peak:
+x <- updates.xts[NYC & onPeak][,2:7]
+
+head(is.na(x))
+
+x[!is.na(x[,1:6])!=rep(TRUE,6),]
+tail(!is.na(x))
 
 plot(x, screens=1:6)
-colMeans(x,na.rm=TRUE)
-tail(x)
-sapply(as.data.frame(x[!is.na(x)]),mean)
+
+Index <- wday(index(x))
+tapply(x[,6],INDEX=Index,mean)/sqrt(tapply(x[,6],INDEX=Index,var,na.rm=TRUE))
+
+
+apply(x[,1:6], 2, FUN = mean, na.rm=TRUE)
+apply(x[,1:6], 2, FUN = sd, na.rm=TRUE)
+apply(x[,1:6], 2, FUN = mean, na.rm=TRUE)/apply(x[,1:6], 2, FUN = sd, na.rm=TRUE)
+sapply(x, FUN = cov, na.rm=TRUE)
+
+sapply(x[,1], FUN=hist)
+
+mean(x[,6])
+
 x[!is.na(x)]
 head(!is.na(x))
 
@@ -88,25 +120,17 @@ nrow(is.na(as.matrix(x)))
 
 xNArows <- union(index(x[is.na(x[,1])]),index(x[is.na(x[,2])]))
 mean(x[!xNAs,1])
-x[!is.na(x)]
+x[is.na(x),1]
+length(is.na(x))
+length(x)
+head(is.na(x))
+dim(is.na(x))
 
-na.rm()
-y1 <- na.fill(as.zoo(x),'extend')
-mean(y1)
-dim(y1)
-dim(x)
-y <- as.xts(y1)
-y[!x==y]
+xNArows
 
-z <- zoo(c(NA, 2, NA, 1, 4, 5, 2, NA))
-na.fill(z, "extend")
+hist(x[,6],20)
 
-mean(y)
-sapply(x[!is.na(x)],mean)
-is.na(x)[,1]==TRUE
-
-hist(x[,1],20)
-
+hist(x[,1])
 x[is.na(x)]
 
 is.na(x)
