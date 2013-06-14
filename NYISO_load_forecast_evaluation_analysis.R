@@ -4,19 +4,23 @@
 #  Written in conjunction with article, "Are load forecasters rational?"
 
 # Load packages and datasets ----------------------------------------------
-
-# Provides support for eXtensible Time Series (xts) objects:
+require(stats)
+# Provide support for eXtensible Time Series (xts) objects:
 library(xts)
 library(zoo)
-# Provides additional plotting support for xts objects:
+# Provide additional plotting support for xts objects:
 # install.packages("xtsExtra", repos='http://r-forge.r-project.org')
 library(xtsExtra)
-# Provides support for NERC/NYISO holidays:
+# Provide support for NERC/NYISO holidays:
 library(timeDate)    
-# Provides support for handy date-time utilities:
+# Provide support for handy date-time utilities:
 library(lubridate)
-# Provides support for graphics:
+# Provide support for graphics:
 library(graphics)
+# Provide support for R-to-LaTeX conversion of output
+library(xtable)
+# library(stargazer)
+# library(Hmisc)     # Provides support for latex() function
 
 # Load datasets prepared previously ---------------------------------------
 
@@ -62,92 +66,175 @@ Winter <- month(Time) %in% c(12,1,2)
 #   Daylight Savings Time versus Standard Time
 DST <- dst(Time)
 
-# GENERATE SUMMARY STATISTICS AND PLOTS -----------------------------------
+# Various smaller subsets, for closer examination
+NYCpeak17 <- NYC & onPeak & Hr17
+
+# GENERATE SUMMARY STATISTICS AND PLOTS -------------------------------
 
 # Realized loads for NYC, 5-6p.m. on weekdays
-plot(obs.xts[onPeak & NYC & Hr17 & Summer]['2012']$obs)
-
-min(obs.xts[NYC & onPeak & Summer]$obs)
-
-NYCpeakLoads <- obs.xts[NYC & onPeak]$obs
-tail(NYCpeakLoads)
-str(NYCpeakLoads)
-dim(NYCpeakLoads)
-
-obs.xts
-tail(NYC)
-tail(onPeak)
-tail(NYC & onPeak, 25)
-
-tail(month(index(NYCpeakLoads)))
-NYCpeak <- NYCpeakLoads[!is.na(NYCpeakLoads)]
-
-tapply(NYCpeak,INDEX=month(index(NYCpeak)),mean)/sqrt(tapply(NYCpeak,INDEX=month(index(NYCpeak)),var))
-max(obs.xts[NYC & Hr17 & onPeak & Summer]$obs, na.rm=TRUE)
-
-
-#  - Forecast updates for New York City (zone ID 61761), hour 17 (5:00-6:00 p.m), on-peak:
-x <- updates.xts[NYC & onPeak][,2:7]
-
-head(is.na(x))
-
-x[!is.na(x[,1:6])!=rep(TRUE,6),]
-tail(!is.na(x))
-
-plot(x, screens=1:6)
-
-Index <- wday(index(x))
-tapply(x[,6],INDEX=Index,mean)/sqrt(tapply(x[,6],INDEX=Index,var,na.rm=TRUE))
-
-
-apply(x[,1:6], 2, FUN = mean, na.rm=TRUE)
-apply(x[,1:6], 2, FUN = sd, na.rm=TRUE)
-apply(x[,1:6], 2, FUN = mean, na.rm=TRUE)/apply(x[,1:6], 2, FUN = sd, na.rm=TRUE)
-sapply(x, FUN = cov, na.rm=TRUE)
-
-sapply(x[,1], FUN=hist)
-
-mean(x[,6])
-
-x[!is.na(x)]
-head(!is.na(x))
-
-x[!(!is.na(as.matrix(x))[,1] & !is.na(as.matrix(x))[,2])]
-
-head(is.na(as.matrix(x)[,]))
-
-nrow(is.na(as.matrix(x)))
-
-xNArows <- union(index(x[is.na(x[,1])]),index(x[is.na(x[,2])]))
-mean(x[!xNAs,1])
-x[is.na(x),1]
-length(is.na(x))
-length(x)
-head(is.na(x))
-dim(is.na(x))
-
-xNArows
-
-hist(x[,6],20)
-
-hist(x[,1])
-x[is.na(x)]
-
-is.na(x)
-mean(as.data.frame(x),na.rm=TRUE)
-
-A <- c(T,T,F,T,F)
-as.logical(1-A)
-!A
-!is.na(x)
-
-mean(A)
-
-# Check for biases in forecast updates -------------------------------------
+# plot(obs.xts[NYCpeak17 & Summer]['2012']$obs)
+# 
+# 
+# NYC17peakLoads <- obs.xts[NYCpeak17]$obs
+# 
+# tail(NYCpeakLoads)
+# str(NYCpeakLoads)
+# dim(NYCpeakLoads)
+# 
+# obs.xts
+# tail(NYC)
+# tail(onPeak)
+# tail(NYC & onPeak, 25)
+# 
+# tail(month(index(NYCpeakLoads)))
+# NYC17peakLoads <- NYC17peakLoads[!is.na(NYC17peakLoads)]
+# x <- NYCpeak17
+# 
+# tapply(NYCpeak,INDEX=month(index(NYCpeak)),mean)/sqrt(tapply(NYCpeak,INDEX=month(index(NYCpeak)),var))
+# max(obs.xts[NYC & Hr17 & onPeak & Summer]$obs, na.rm=TRUE)
+# Index <- index(x)
+# Numx <- xts(!is.na(x),order.by=Index)
+# head(NYCpeak)
+# head(acf(x))
+# class(acf(x))
+# acfx$lag <- acfx$lag/3600
+# acfx
+# plot(acfx)
+# index(x)
+# acfx <- acf(x)
+# class(acfx)
+# str(acfx)
+# frequency(NYCpeak)
+# 
+# x[!is.na(x[,1]) & !is.na(x[,2])]
+# 
+# head(x[,1][Numx[,1]])
 
 
+# Forecast trends
 
-# Check for autocorrelation in the forecast updating process --------------
+
+# Q: Can the trend in successive forecasts help predict the direction of the last update?
+
+first5Fcsts <- forecasts.xts[NYC & Hr00][,2:6]
+lastUpdate  <- updates.xts[NYC & Hr00][,7]
+
+goodRows <- complete.cases(first5Fcsts) & complete.cases(lastUpdate)
+
+f5 <- first5Fcsts[goodRows]
+lu <- lastUpdate[goodRows]
+
+class(f5)
+f5 <- t(as.matrix(first5Fcsts))
+
+lag <- 1:5
+model <- lm(fVecs ~ lag,na.action=na.exclude)
+fs <- model$coefficients[2,]
+
+us <- lastUpdate
+ufs <- as.matrix(cbind(us,fs))
+plot(ufs)
+cor(ufs)
+
+#  Forecast errors
+
+# x <- errors.xts[NYC][,2:7]
+# RowsWithNoNAs <- !is.na(as.matrix(x))[,1] & !is.na(as.matrix(x))[,2] & !is.na(as.matrix(x))[,3] & !is.na(as.matrix(x))[,4] & !is.na(as.matrix(x))[,5] & !is.na(as.matrix(x))[,6]
+# x <- x[RowsWithNoNAs]
+# cor(x)
+# plot(x)
+# 
+# errorFrac.xts <- errors.xts/forecasts.xts
+# errorFracNYC.xts <- (errors.xts[NYC][,2:7])/(forecasts.xts[NYC][,2:7])
+# head(errorFracNYC.xts)
+# tail(errorFracNYC.xts)
+# plot(errorFracNYC.xts)
+# abs(tail(errors.xts))
+# x <- errorFracNYC.xts[abs(errorFracNYC.xts[,1])<0.5]
+# plot(x)
+# breaks <- seq(-0.45,0.45,by=0.005)
+# yLim=c(0,4000)
+# xLim=c(-0.25,0.25)
+# hist(x[,1],breaks=breaks,ylim=yLim,xlim=xLim)
+# sqrt(var(x))
+# cov(x)==var(x)
+# cor(x)
+
+#  Forecast updates for N.Y.C. (zone ID 61761), hour 17 (5:00-6:00 p.m), on-peak:
+x <- updates.xts[NYC][,2:7]
+RowsWithNoNAs <- !is.na(as.matrix(x))[,1] & !is.na(as.matrix(x))[,2] & !is.na(as.matrix(x))[,3] & !is.na(as.matrix(x))[,4] & !is.na(as.matrix(x))[,5] & !is.na(as.matrix(x))[,6]
+x <- x[RowsWithNoNAs]
+cor(x)
+
+
+# Generate a LaTeX table of correlation coefficients
+latex(cor(x))
+
+
+# Index <- yday(index(x))
+# 
+# x[wday(index(x))==1]
+# 
+# tapply(x,INDEX=Index,cor)
+# 
+# 
+# plot(x, screens=1:6)
+# 
+# Vec <- tapply(x[,6],INDEX=Index,mean)/sqrt(tapply(x[,6],INDEX=Index,var,na.rm=TRUE))
+# hist(Vec)
+# qqnorm(Vec)
+# qqplot(Vec)
+# apply(x[,1:6], 2, FUN = mean, na.rm=TRUE)
+# apply(x[,1:6], 2, FUN = sd, na.rm=TRUE)
+# apply(x[,1:6], 2, FUN = mean, na.rm=TRUE)/apply(x[,1:6], 2, FUN = sd, na.rm=TRUE)
+# sapply(x, FUN = cov, na.rm=TRUE)
+# 
+# sapply(x[,1], FUN=hist)
+# 
+# mean(x[,6])
+# 
+# x[!is.na(x)]
+# head(!is.na(x))
+# 
+# mean(x[,1])
+# 
+# head(as.matrix(x[,1:6]))==head(as.matrix(x))
+# 
+# class(as.matrix(x))
+# index(as.matrix(x))
+# head(is.na(as.matrix(x)[,]))
+# str(as.matrix(x))
+# nrow(is.na(as.matrix(x)))
+# 
+# xNArows <- union(index(x[is.na(x[,1])]),index(x[is.na(x[,2])]))
+# mean(x[,1][!xNAs])
+# x[is.na(x),1]
+# length(is.na(x))
+# length(x)
+# head(is.na(x))
+# dim(is.na(x))
+# 
+# xNArows
+# 
+# hist(x[,6],20)
+# 
+# hist(x[,1])
+# x[is.na(x)]
+# 
+# is.na(x)
+# mean(as.data.frame(x),na.rm=TRUE)
+# 
+# A <- c(T,T,F,T,F)
+# as.logical(1-A)
+# !A
+# !is.na(x)
+# 
+# mean(A)
+
+# BIAS: Check for biases in forecast updates -----------------------------------
+
+
+# AUTOCORRELATION: Check for autocorrelation in the forecast updating process --------------
 
 
 # cov(u.df,na.rm=TRUE)
@@ -155,7 +242,7 @@ mean(A)
 # cov(u.xts,na.rm=TRUE)
 
 
-# Hurricane Sandy ---------------------------------------------------------
+# SANDY: Hurricane Sandy -------------------------------------------------------
 
 # subset.xts <- forecasts.xts[.indexhour(forecasts.xts)==0 & forecasts.xts$zone==61761]
 # subset.xts <- subset.xts['2012-11']
