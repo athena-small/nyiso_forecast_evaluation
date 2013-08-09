@@ -1,5 +1,5 @@
 #  File dataPrep.R
-#  Fetches NYISO load forecasts and obs from local CSV files, organizes these into two xts objects
+#  Fetches load forecasts and observations for the New York Independent System Operator (NYISO) from local CSV files, organizes these into two eXtensible Time Series (xts) objects
 #  Each value represents load (in MWh/hr) for one hour, for one NYISO zone. 
 
 library(xts)
